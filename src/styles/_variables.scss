@@ -1,0 +1,53 @@
+$font-sans: Inter, "HarmonyOS Sans SC", "Microsoft YaHei", Arial, sans-serif;
+
+// Core Figma palette. Components consume these tokens instead of color literals.
+$color-black: #000;
+$color-white: #fff;
+$color-canvas: #030303;
+$color-panel: #0a0b0d;
+$color-preview: #0d0e10;
+$color-ink-dark: #111317;
+$color-surface: #15161a;
+$color-surface-hover: #1b1d22;
+$color-control-alt: #1f2126;
+$color-control: #1f2228;
+$color-border: #26282e;
+$color-border-alt: #26292e;
+$color-ink: #263238;
+$color-border-hover: #44474f;
+$color-scrollbar: #555860;
+$color-text-subtle: #6b7280;
+$color-text-muted: #8a8d93;
+$color-placeholder: #929292;
+$color-text-secondary: #c5c7cc;
+$color-icon: #e0e1e5;
+$color-text-selected: #e5e5ed;
+$color-text-preview: #e5e7eb;
+$color-text: #f5f5f7;
+$color-accent: #fe0000;
+$color-accent-link: #ff3b30;
+$color-accent-hover: #ff3535;
+$color-transparent: transparent;
+
+// Alpha colors and effects from the Figma compositions.
+$color-card-shadow: rgba(0, 0, 0, .35);
+$color-card-number: rgba(255, 255, 255, .02);
+$color-card-number-stroke: rgba(255, 255, 255, .04);
+$color-generate-shadow: rgba(79, 70, 229, .2);
+$color-popover-shadow-soft: rgba(38, 50, 56, .02);
+$color-popover-shadow: rgba(38, 50, 56, .1);
+$color-scrollbar-overlay: rgba(255, 255, 255, .5);
+$color-hover-overlay: rgba(255, 255, 255, .28);
+
+// Semantic aliases used by the page shell.
+$color-bg: $color-black;
+$color-header: $color-surface;
+$color-muted: $color-text-muted;
+$header-height: 53px;
+$content-max: 1192px;
+$radius-md: 13px;
+$space-1: 8px;
+$space-2: 16px;
+$space-3: 24px;
+$space-4: 32px;
+$space-5: 48px;
