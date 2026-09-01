@@ -1,20 +1,105 @@
 [
-  { "id": "pdf-01", "page": 1, "chs": "欧洲小镇风格的产业园", "en": "European-style industrial park in a small town" },
-  { "id": "pdf-02", "page": 2, "chs": "海边的白色度假酒店", "en": "A white seaside resort hotel" },
-  { "id": "pdf-03", "page": 3, "chs": "很有未来感的科技公司总部", "en": "A futuristic technology company headquarters" },
-  { "id": "pdf-04", "page": 4, "chs": "中式园林风格的社区图书馆", "en": "A community library in a Chinese garden style" },
-  { "id": "pdf-05", "page": 5, "chs": "夜景很漂亮的城市商业街", "en": "An urban commercial street with a beautiful night scene" },
-  { "id": "pdf-06", "page": 6, "chs": "像森林一样的办公园区", "en": "A forest-like office park" },
-  { "id": "pdf-07", "page": 7, "chs": "老厂房改造的创意园", "en": "A creative park renovated from an old factory" },
-  { "id": "pdf-08", "page": 8, "chs": "色彩明快、适合孩子的幼儿园", "en": "A brightly colored, child-friendly kindergarten" },
-  { "id": "pdf-09", "page": 9, "chs": "街景人眼视角拍摄一栋高层办公楼，方正简洁的体块，通透玻璃幕墙搭配银灰色铝板，晴天自然光。", "en": "A high-rise office building photographed from an eye-level street view, with simple rectilinear volumes, a transparent glass curtain wall paired with silver-gray aluminum panels, in natural daylight on a clear day." },
-  { "id": "pdf-10", "page": 10, "chs": "从前广场视角看一座当代美术馆，错落的盒子体量和大挑檐，清水混凝土搭配浅色石材，入口有少量人群。", "en": "View a contemporary art museum from the front plaza, with staggered box volumes and large cantilevered eaves, exposed concrete paired with light-colored stone, and a small crowd at the entrance." },
-  { "id": "pdf-11", "page": 11, "chs": "水岸斜向鸟瞰一座滨水文化中心，流线型屋顶，大面积玻璃与钛锌金属板，傍晚暖色灯光。", "en": "An oblique bird's-eye view from the waterfront of a waterside cultural center, with a streamlined roof, large areas of glass and titanium-zinc metal panels, and warm evening lighting." },
-  { "id": "pdf-12", "page": 12, "chs": "从内庭院视角拍摄一组大学教学楼，连廊围合出绿化庭院，暖色陶板与玻璃幕墙，柔和阴天光线。", "en": "A group of university teaching buildings photographed from the inner courtyard, with corridors enclosing a landscaped courtyard, warm-colored ceramic panels and glass curtain walls, in soft overcast light." },
-  { "id": "pdf-13", "page": 13, "chs": "高位鸟瞰一座现代物流产业园，多栋锯齿形屋顶厂房整齐排列，预制混凝土与深色金属屋面，加入货车和道路系统。", "en": "A high-angle bird's-eye view of a modern logistics industrial park, with multiple sawtooth-roof factories neatly arranged, precast concrete and dark metal roofs, including trucks and road systems." },
-  { "id": "pdf-14", "page": 14, "chs": "近距离斜侧视角表现一座旧仓库改造的公共图书馆，保留红砖墙和钢桁架，新增透明玻璃盒子，雨后湿润地面。", "en": "A close oblique view of a public library converted from an old warehouse, retaining red brick walls and steel trusses, with a new transparent glass box and rain-wet ground." },
-  { "id": "pdf-15", "page": 15, "chs": "从湖对岸远景拍摄一座山地度假酒店，建筑顺等高线层层退台，天然石材与深色木材，清晨薄雾。", "en": "A mountain resort hotel photographed from the distant opposite shore of a lake, with the building stepping down along the contour lines, natural stone and dark wood, in early morning mist." },
-  { "id": "pdf-16", "page": 16, "chs": "参考图一的蓝灰玻璃材质和竖向银色框架，参考图二的白色飘带曲线，设计一座城市博物馆，从前广场视角看。", "en": "Design a city museum using the blue-gray glass and vertical silver frames from reference image one and the white ribbon curves from reference image two, viewed from the front plaza." },
-  { "id": "pdf-17", "page": 17, "chs": "参考图一的水平层叠体量，参考图二的蓝灰玻璃竖向分格，设计一座大学创新中心，从内庭院视角看。", "en": "Design a university innovation center using the horizontally layered massing from reference image one and the vertical blue-gray glass divisions from reference image two, viewed from the inner courtyard." },
-  { "id": "pdf-18", "page": 18, "chs": "参考图一的层叠建筑体量，参考图二的橙色起伏地形，参考图三的热带植物景观，设计一座儿童科技馆，从公园入口视角看。", "en": "Design a children's science and technology museum using the layered building massing from reference image one, the undulating orange terrain from reference image two, and the tropical planting from reference image three, viewed from the park entrance." }
+    {
+        "id": "pdf-01",
+        "page": 1,
+        "chs": "欧洲小镇风格的产业园",
+        "en": "European-style industrial park in a small town"
+    },
+    {
+        "id": "pdf-02",
+        "page": 2,
+        "chs": "海边的白色度假酒店",
+        "en": "A white seaside resort hotel"
+    },
+    {
+        "id": "pdf-03",
+        "page": 3,
+        "chs": "很有未来感的科技公司总部",
+        "en": "A futuristic technology company headquarters"
+    },
+    {
+        "id": "pdf-04",
+        "page": 4,
+        "chs": "中式园林风格的社区图书馆",
+        "en": "A community library in a Chinese garden style"
+    },
+    {
+        "id": "pdf-05",
+        "page": 5,
+        "chs": "夜景很漂亮的城市商业街",
+        "en": "An urban commercial street with a beautiful night scene"
+    },
+    { "id": "pdf-06", "page": 6, "chs": "像森林一样的办公园区", "en": "A forest-like office park" },
+    {
+        "id": "pdf-07",
+        "page": 7,
+        "chs": "老厂房改造的创意园",
+        "en": "A creative park renovated from an old factory"
+    },
+    {
+        "id": "pdf-08",
+        "page": 8,
+        "chs": "色彩明快、适合孩子的幼儿园",
+        "en": "A brightly colored, child-friendly kindergarten"
+    },
+    {
+        "id": "pdf-09",
+        "page": 9,
+        "chs": "街景人眼视角拍摄一栋高层办公楼，方正简洁的体块，通透玻璃幕墙搭配银灰色铝板，晴天自然光。",
+        "en": "A high-rise office building photographed from an eye-level street view, with simple rectilinear volumes, a transparent glass curtain wall paired with silver-gray aluminum panels, in natural daylight on a clear day."
+    },
+    {
+        "id": "pdf-10",
+        "page": 10,
+        "chs": "从前广场视角看一座当代美术馆，错落的盒子体量和大挑檐，清水混凝土搭配浅色石材，入口有少量人群。",
+        "en": "View a contemporary art museum from the front plaza, with staggered box volumes and large cantilevered eaves, exposed concrete paired with light-colored stone, and a small crowd at the entrance."
+    },
+    {
+        "id": "pdf-11",
+        "page": 11,
+        "chs": "水岸斜向鸟瞰一座滨水文化中心，流线型屋顶，大面积玻璃与钛锌金属板，傍晚暖色灯光。",
+        "en": "An oblique bird's-eye view from the waterfront of a waterside cultural center, with a streamlined roof, large areas of glass and titanium-zinc metal panels, and warm evening lighting."
+    },
+    {
+        "id": "pdf-12",
+        "page": 12,
+        "chs": "从内庭院视角拍摄一组大学教学楼，连廊围合出绿化庭院，暖色陶板与玻璃幕墙，柔和阴天光线。",
+        "en": "A group of university teaching buildings photographed from the inner courtyard, with corridors enclosing a landscaped courtyard, warm-colored ceramic panels and glass curtain walls, in soft overcast light."
+    },
+    {
+        "id": "pdf-13",
+        "page": 13,
+        "chs": "高位鸟瞰一座现代物流产业园，多栋锯齿形屋顶厂房整齐排列，预制混凝土与深色金属屋面，加入货车和道路系统。",
+        "en": "A high-angle bird's-eye view of a modern logistics industrial park, with multiple sawtooth-roof factories neatly arranged, precast concrete and dark metal roofs, including trucks and road systems."
+    },
+    {
+        "id": "pdf-14",
+        "page": 14,
+        "chs": "近距离斜侧视角表现一座旧仓库改造的公共图书馆，保留红砖墙和钢桁架，新增透明玻璃盒子，雨后湿润地面。",
+        "en": "A close oblique view of a public library converted from an old warehouse, retaining red brick walls and steel trusses, with a new transparent glass box and rain-wet ground."
+    },
+    {
+        "id": "pdf-15",
+        "page": 15,
+        "chs": "从湖对岸远景拍摄一座山地度假酒店，建筑顺等高线层层退台，天然石材与深色木材，清晨薄雾。",
+        "en": "A mountain resort hotel photographed from the distant opposite shore of a lake, with the building stepping down along the contour lines, natural stone and dark wood, in early morning mist."
+    },
+    {
+        "id": "pdf-16",
+        "page": 16,
+        "chs": "参考图一的蓝灰玻璃材质和竖向银色框架，参考图二的白色飘带曲线，设计一座城市博物馆，从前广场视角看。",
+        "en": "Design a city museum using the blue-gray glass and vertical silver frames from reference image one and the white ribbon curves from reference image two, viewed from the front plaza."
+    },
+    {
+        "id": "pdf-17",
+        "page": 17,
+        "chs": "参考图一的水平层叠体量，参考图二的蓝灰玻璃竖向分格，设计一座大学创新中心，从内庭院视角看。",
+        "en": "Design a university innovation center using the horizontally layered massing from reference image one and the vertical blue-gray glass divisions from reference image two, viewed from the inner courtyard."
+    },
+    {
+        "id": "pdf-18",
+        "page": 18,
+        "chs": "参考图一的层叠建筑体量，参考图二的橙色起伏地形，参考图三的热带植物景观，设计一座儿童科技馆，从公园入口视角看。",
+        "en": "Design a children's science and technology museum using the layered building massing from reference image one, the undulating orange terrain from reference image two, and the tropical planting from reference image three, viewed from the park entrance."
+    }
 ]

@@ -1,1 +1,66 @@
-{"nav":{"textToImage":"Text to Image","imageToImage":"Image to Image","language":"中/EN"},"home":{"title":"MODE SELECTION","tagline":"AIRI · The Architect's Own AI","cards":{"text":{"title":"Text Generation · Inspiration Exploration","description":"Describe your design intent with words to quickly generate architectural concept images and visual inspiration."},"image":{"title":"Reference Image Generation · Creative Refinement","description":"Upload reference images, retain core composition and design features, and generate more detailed and expressive architectural renderings."}},"start":"Start Creating","configuration":"Configure AIRI Explore V3"},"workspace":{"textTitle":"Text to Image","textDescription":"Turn a written architectural idea into a visual concept.","imageTitle":"Image to Image","imageDescription":"Upload a reference image to begin a creative refinement.","back":"Back to mode selection","comingSoon":"Workspace ready for integration"},"textToImage":{"preview":"Preview","previewDescription":"The generated image will be displayed here","template":"Prompt Template","promptLabel":"Image prompt","promptPlaceholder":"Describe the building you want, for example: ‘A modern library at dusk, glass curtain walls, water reflections, cinematic lighting’","voice":"Record prompt","refresh":"Clear prompt","start":"Start Creating","closeTemplates":"Close prompt templates"},"imageToImage":{"title":"Creative Refinement (AIRIIab V3)","template":"Template","baseHeading":"1. Upload Base Image","baseUpload":"Drag, click, or paste to upload images","baseType":"Select Base Image Type","referenceHeading":"2. Style Reference Images (1–2)","referenceUpload":"Drag, click, or paste to upload reference images","tags":"Select Reference Image Tags:","promptHeading":"3. Enter Prompt Words","promptPlaceholder":"Describe the image content you want to generate","generate":"Generate Image","preview":"Preview","previewDescription":"Generated images will appear here"}}
+{
+    "common": {
+        "homeLabel": "Huawei AIRI home",
+        "mainNavigation": "Main navigation",
+        "switchLanguage": "Switch language"
+    },
+    "nav": {
+        "textToImage": "Text to Image",
+        "imageToImage": "Image to Image",
+        "language": "中/EN"
+    },
+    "home": {
+        "title": "MODE SELECTION",
+        "tagline": "AIRI · The Architect's Own AI",
+        "cards": {
+            "text": {
+                "title": "Text Generation · Inspiration Exploration",
+                "description": "Describe your design intent with words to quickly generate architectural concept images and visual inspiration."
+            },
+            "image": {
+                "title": "Reference Image Generation · Creative Refinement",
+                "description": "Upload reference images, retain core composition and design features, and generate more detailed and expressive architectural renderings."
+            }
+        },
+        "start": "Start Creating",
+        "configuration": "Configure AIRI Explore V3"
+    },
+    "workspace": {
+        "textTitle": "Text to Image",
+        "textDescription": "Turn a written architectural idea into a visual concept.",
+        "imageTitle": "Image to Image",
+        "imageDescription": "Upload a reference image to begin a creative refinement.",
+        "back": "Back to mode selection",
+        "comingSoon": "Workspace ready for integration"
+    },
+    "textToImage": {
+        "preview": "Preview",
+        "previewDescription": "The generated image will be displayed here",
+        "template": "Prompt Template",
+        "promptLabel": "Image prompt",
+        "promptPlaceholder": "Describe the building you want, for example: ‘A modern library at dusk, glass curtain walls, water reflections, cinematic lighting’",
+        "voice": "Record prompt",
+        "refresh": "Clear prompt",
+        "start": "Start Creating",
+        "closeTemplates": "Close prompt templates",
+        "promptTemplatesDialog": "Prompt templates"
+    },
+    "imageToImage": {
+        "title": "Creative Refinement (AIRIIab V3)",
+        "template": "Template",
+        "baseHeading": "1. Upload Base Image",
+        "baseUpload": "Drag, click, or paste to upload images",
+        "baseType": "Select Base Image Type",
+        "referenceHeading": "2. Style Reference Images (1–2)",
+        "referenceUpload": "Drag, click, or paste to upload reference images",
+        "tags": "Select Reference Image Tags:",
+        "promptHeading": "3. Enter Prompt Words",
+        "promptPlaceholder": "Describe the image content you want to generate",
+        "generate": "Generate Image",
+        "preview": "Preview",
+        "previewDescription": "Generated images will appear here",
+        "referenceImageLabel": "Reference image {{number}}",
+        "imageLabel": "Image {{number}}",
+        "removeImageLabel": "Remove image {{number}}"
+    }
+}

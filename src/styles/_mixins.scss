@@ -1,4 +1,12 @@
 @use 'variables' as *;
 
-@mixin container { width: min(calc(100% - 48px), $content-max); margin-inline: auto; }
-@mixin focus-ring { &:focus-visible { outline: 2px solid $color-accent; outline-offset: 4px; } }
+@mixin container {
+    width: min(calc(100% - 48px), $content-max);
+    margin-inline: auto;
+}
+@mixin focus-ring {
+    &:focus-visible {
+        outline: 2px solid $color-accent;
+        outline-offset: 4px;
+    }
+}

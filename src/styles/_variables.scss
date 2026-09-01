@@ -1,4 +1,4 @@
-$font-sans: Inter, "HarmonyOS Sans SC", "Microsoft YaHei", Arial, sans-serif;
+$font-sans: Inter, 'HarmonyOS Sans SC', 'Microsoft YaHei', Arial, sans-serif;
 
 // Core Figma palette. Components consume these tokens instead of color literals.
 $color-black: #000;
@@ -30,14 +30,14 @@ $color-accent-hover: #ff3535;
 $color-transparent: transparent;
 
 // Alpha colors and effects from the Figma compositions.
-$color-card-shadow: rgba(0, 0, 0, .35);
-$color-card-number: rgba(255, 255, 255, .02);
-$color-card-number-stroke: rgba(255, 255, 255, .04);
-$color-generate-shadow: rgba(79, 70, 229, .2);
-$color-popover-shadow-soft: rgba(38, 50, 56, .02);
-$color-popover-shadow: rgba(38, 50, 56, .1);
-$color-scrollbar-overlay: rgba(255, 255, 255, .5);
-$color-hover-overlay: rgba(255, 255, 255, .28);
+$color-card-shadow: rgba(0, 0, 0, 0.35);
+$color-card-number: rgba(255, 255, 255, 0.02);
+$color-card-number-stroke: rgba(255, 255, 255, 0.04);
+$color-generate-shadow: rgba(79, 70, 229, 0.2);
+$color-popover-shadow-soft: rgba(38, 50, 56, 0.02);
+$color-popover-shadow: rgba(38, 50, 56, 0.1);
+$color-scrollbar-overlay: rgba(255, 255, 255, 0.5);
+$color-hover-overlay: rgba(255, 255, 255, 0.28);
 
 // Semantic aliases used by the page shell.
 $color-bg: $color-black;
