@@ -47,7 +47,7 @@
         "baseHeading": "1. 上传底图",
         "baseUpload": "拖拽、点击或粘贴上传图片",
         "baseType": "选择底图类型",
-        "referenceHeading": "2. 风格参考图（1–2张）",
+        "referenceHeading": "2. 风格参考图（1–3张）",
         "referenceUpload": "拖拽、点击或粘贴上传参考图",
         "tags": "选择参考图标签：",
         "promptHeading": "3. 输入提示词",

@@ -5,13 +5,5 @@
         { "id": "interior", "en": "Interior", "chs": "室内" },
         { "id": "landscape", "en": "Landscape", "chs": "景观" },
         { "id": "urban", "en": "Urban", "chs": "城市" }
-    ],
-    "referenceTags": [
-        { "id": "design", "en": "Design Techniques", "chs": "设计手法" },
-        { "id": "facade", "en": "Facade Design", "chs": "立面设计" },
-        { "id": "materials", "en": "Materials & Construction", "chs": "材料构造" },
-        { "id": "site", "en": "Site Landscaping", "chs": "场地配景" },
-        { "id": "lighting", "en": "Light & Atmosphere", "chs": "光影氛围" },
-        { "id": "style", "en": "Image Style", "chs": "图像风格" }
     ]
 }

@@ -51,7 +51,7 @@
         "baseHeading": "1. Upload Base Image",
         "baseUpload": "Drag, click, or paste to upload images",
         "baseType": "Select Base Image Type",
-        "referenceHeading": "2. Style Reference Images (1–2)",
+        "referenceHeading": "2. Style Reference Images (1–3)",
         "referenceUpload": "Drag, click, or paste to upload reference images",
         "tags": "Select Reference Image Tags:",
         "promptHeading": "3. Enter Prompt Words",

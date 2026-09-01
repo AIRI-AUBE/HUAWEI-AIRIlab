@@ -912,6 +912,8 @@ a {
 }
 
 .reference-tags button {
+    min-width: 0;
+    min-height: 34px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -931,6 +933,7 @@ a {
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    text-align: center;
 }
 
 .reference-tags button.selected {
@@ -939,9 +942,10 @@ a {
     text-align: center;
 }
 
-.reference-tags button:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
+.reference-tags button span {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 .refinement-section textarea {

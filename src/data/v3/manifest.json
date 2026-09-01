@@ -1,0 +1,360 @@
+{
+  "version": 1,
+  "source": "explore_V3_case.xlsx",
+  "sheet": "推敲V3_case",
+  "cases": [
+    {
+      "id": "case-001",
+      "excelRow": 2,
+      "type": "建筑",
+      "baseImage": "/v3/cases/case-001/base.webp",
+      "ref1Image": "/v3/cases/case-001/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-001/output.webp"
+    },
+    {
+      "id": "case-002",
+      "excelRow": 3,
+      "type": "建筑",
+      "baseImage": "/v3/cases/case-002/base.webp",
+      "ref1Image": "/v3/cases/case-002/ref-1.webp",
+      "ref1Selections": [
+        4
+      ],
+      "ref2Image": "/v3/cases/case-002/ref-2.webp",
+      "ref2Selections": [
+        2,
+        5,
+        6
+      ],
+      "ref3Image": "/v3/cases/case-002/ref-3.webp",
+      "ref3Selections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "expectedOutput": "/v3/cases/case-002/output.webp"
+    },
+    {
+      "id": "case-003",
+      "excelRow": 4,
+      "type": "建筑",
+      "baseImage": null,
+      "ref1Image": "/v3/cases/case-003/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3
+      ],
+      "ref2Image": "/v3/cases/case-003/ref-2.webp",
+      "ref2Selections": [
+        2,
+        6
+      ],
+      "ref3Image": "/v3/cases/case-003/ref-3.webp",
+      "ref3Selections": [
+        1,
+        4,
+        5
+      ],
+      "expectedOutput": "/v3/cases/case-003/output.webp"
+    },
+    {
+      "id": "case-004",
+      "excelRow": 5,
+      "type": "建筑",
+      "baseImage": "/v3/cases/case-004/base.webp",
+      "ref1Image": "/v3/cases/case-004/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "ref2Image": "/v3/cases/case-004/ref-2.webp",
+      "ref2Selections": [
+        5,
+        6
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-004/output.webp"
+    },
+    {
+      "id": "case-005",
+      "excelRow": 6,
+      "type": "建筑",
+      "baseImage": "/v3/cases/case-005/base.webp",
+      "ref1Image": "/v3/cases/case-005/ref-1.webp",
+      "ref1Selections": [
+        3,
+        4,
+        5
+      ],
+      "ref2Image": "/v3/cases/case-005/ref-2.webp",
+      "ref2Selections": [
+        1,
+        2,
+        6
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-005/output.webp"
+    },
+    {
+      "id": "case-006",
+      "excelRow": 7,
+      "type": "室内",
+      "baseImage": "/v3/cases/case-006/base.webp",
+      "ref1Image": "/v3/cases/case-006/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3
+      ],
+      "ref2Image": "/v3/cases/case-006/ref-2.webp",
+      "ref2Selections": [
+        4,
+        5
+      ],
+      "ref3Image": "/v3/cases/case-006/ref-3.webp",
+      "ref3Selections": [
+        5,
+        6
+      ],
+      "expectedOutput": "/v3/cases/case-006/output.webp"
+    },
+    {
+      "id": "case-007",
+      "excelRow": 8,
+      "type": "室内",
+      "baseImage": "/v3/cases/case-007/base.webp",
+      "ref1Image": "/v3/cases/case-007/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "ref2Image": "/v3/cases/case-007/ref-2.webp",
+      "ref2Selections": [
+        2
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-007/output.webp"
+    },
+    {
+      "id": "case-008",
+      "excelRow": 9,
+      "type": "室内",
+      "baseImage": "/v3/cases/case-008/base.webp",
+      "ref1Image": "/v3/cases/case-008/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-008/output.webp"
+    },
+    {
+      "id": "case-009",
+      "excelRow": 10,
+      "type": "室内",
+      "baseImage": "/v3/cases/case-009/base.webp",
+      "ref1Image": "/v3/cases/case-009/ref-1.webp",
+      "ref1Selections": [
+        4
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-009/output.webp"
+    },
+    {
+      "id": "case-010",
+      "excelRow": 11,
+      "type": "室内",
+      "baseImage": "/v3/cases/case-010/base.webp",
+      "ref1Image": "/v3/cases/case-010/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-010/output.webp"
+    },
+    {
+      "id": "case-011",
+      "excelRow": 12,
+      "type": "景观",
+      "baseImage": "/v3/cases/case-011/base.webp",
+      "ref1Image": "/v3/cases/case-011/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-011/output.webp"
+    },
+    {
+      "id": "case-012",
+      "excelRow": 13,
+      "type": "景观",
+      "baseImage": "/v3/cases/case-012/base.webp",
+      "ref1Image": "/v3/cases/case-012/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        6
+      ],
+      "ref2Image": "/v3/cases/case-012/ref-2.webp",
+      "ref2Selections": [
+        4
+      ],
+      "ref3Image": "/v3/cases/case-012/ref-3.webp",
+      "ref3Selections": [
+        5
+      ],
+      "expectedOutput": "/v3/cases/case-012/output.webp"
+    },
+    {
+      "id": "case-013",
+      "excelRow": 14,
+      "type": "景观",
+      "baseImage": "/v3/cases/case-013/base.webp",
+      "ref1Image": "/v3/cases/case-013/ref-1.webp",
+      "ref1Selections": [
+        2
+      ],
+      "ref2Image": null,
+      "ref2Selections": [],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-013/output.webp"
+    },
+    {
+      "id": "case-014",
+      "excelRow": 15,
+      "type": "景观",
+      "baseImage": "/v3/cases/case-014/base.webp",
+      "ref1Image": "/v3/cases/case-014/ref-1.webp",
+      "ref1Selections": [
+        1,
+        3,
+        4
+      ],
+      "ref2Image": "/v3/cases/case-014/ref-2.webp",
+      "ref2Selections": [
+        2
+      ],
+      "ref3Image": "/v3/cases/case-014/ref-3.webp",
+      "ref3Selections": [
+        5,
+        6
+      ],
+      "expectedOutput": "/v3/cases/case-014/output.webp"
+    },
+    {
+      "id": "case-015",
+      "excelRow": 16,
+      "type": "规划",
+      "baseImage": "/v3/cases/case-015/base.webp",
+      "ref1Image": "/v3/cases/case-015/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "ref2Image": "/v3/cases/case-015/ref-2.webp",
+      "ref2Selections": [
+        5,
+        6
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-015/output.webp"
+    },
+    {
+      "id": "case-016",
+      "excelRow": 17,
+      "type": "规划",
+      "baseImage": "/v3/cases/case-016/base.webp",
+      "ref1Image": "/v3/cases/case-016/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "ref2Image": "/v3/cases/case-016/ref-2.webp",
+      "ref2Selections": [
+        5
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-016/output.webp"
+    },
+    {
+      "id": "case-017",
+      "excelRow": 18,
+      "type": "规划",
+      "baseImage": "/v3/cases/case-017/base.webp",
+      "ref1Image": "/v3/cases/case-017/ref-1.webp",
+      "ref1Selections": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "ref2Image": "/v3/cases/case-017/ref-2.webp",
+      "ref2Selections": [
+        5,
+        6
+      ],
+      "ref3Image": null,
+      "ref3Selections": [],
+      "expectedOutput": "/v3/cases/case-017/output.webp"
+    }
+  ]
+}
