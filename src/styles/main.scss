@@ -598,11 +598,11 @@ a {
 }
 
 .image-workspace {
-    width: min(calc(100% - 106px), 1240px);
+    width: min(calc(100% - 142px), 1370px);
     height: calc(100dvh - 106px);
     min-height: 0;
     display: grid;
-    grid-template-columns: 222px minmax(0, 988px);
+    grid-template-columns: 240px minmax(0, 1106px);
     gap: 24px;
     margin: 30px auto 0;
 }
@@ -685,6 +685,129 @@ a {
 
 .refinement-template img:last-child {
     justify-self: end;
+    transition: transform 0.16s ease;
+}
+
+.refinement-template--open img:last-child {
+    transform: rotate(180deg);
+}
+
+.template-selector {
+    position: relative;
+}
+
+.template-popover {
+    position: fixed;
+    z-index: 20;
+    width: 188px;
+    height: 594px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 4px;
+    border: 0;
+    border-radius: 12px;
+    background: #8a8d93;
+    box-shadow:
+        -1.205px 0 2.409px rgba(38, 50, 56, 0.02),
+        1.205px 2.409px 4.818px rgba(38, 50, 56, 0.1);
+    scrollbar-color: rgba(38, 50, 56, 0.55) transparent;
+    scrollbar-width: thin;
+}
+
+.template-popover::-webkit-scrollbar {
+    width: 8px;
+}
+
+.template-popover::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 0 12px 12px 0;
+}
+
+.template-popover::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: rgba(38, 50, 56, 0.72);
+    background-clip: padding-box;
+}
+
+.template-group {
+    width: 180px;
+    min-height: 137px;
+    padding: 12px 5px;
+    border-radius: 7.227px;
+}
+
+.template-group + .template-group {
+    margin-top: 10px;
+}
+
+.template-group h2 {
+    margin: 0 0 4px;
+    color: #263238;
+    font-family: 'Albert Sans', $font-sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+}
+
+.template-group__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 80px);
+    justify-content: center;
+    gap: 8px;
+}
+
+.template-group:last-child .template-card:only-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+}
+
+.template-card {
+    position: relative;
+    width: 80px;
+    height: 92px;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    border-radius: 8px;
+    background: $color-surface;
+    cursor: pointer;
+    transition:
+        border-color 0.16s ease,
+        opacity 0.16s ease;
+}
+
+.template-card:hover {
+    opacity: 0.84;
+}
+
+.template-card--selected {
+    border-color: $color-text-selected;
+    box-shadow: 0 0 0 1px $color-text-selected;
+}
+
+.template-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+.template-card__label {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    padding: 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    color: $color-white;
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: normal;
+    white-space: nowrap;
 }
 
 .refinement-section {
@@ -692,7 +815,7 @@ a {
 }
 
 .refinement-section--base {
-    height: 196px;
+    // height: 196px;
 }
 
 .refinement-section--references {
@@ -730,6 +853,29 @@ a {
     transition:
         border-color 0.16s ease,
         background-color 0.16s ease;
+}
+
+.image-upload-field {
+    width: 180px;
+}
+.image-upload--error {
+    border-color: #d94b4b;
+}
+.image-upload__status,
+.generation-error {
+    margin: 5px 0 0;
+    color: $color-text-secondary;
+    font-size: 10px;
+    line-height: 1.35;
+}
+.image-upload__status--error,
+.generation-error {
+    color: #ff8f8f;
+}
+.generation-error {
+    position: absolute;
+    bottom: 0;
+    width: 180px;
 }
 
 .refinement-section > .image-upload {
@@ -922,7 +1068,7 @@ a {
     justify-self: stretch;
     grid-row: span 1;
     grid-column: span 1;
-    padding: 5px 10px;
+    padding: 5px 2px;
     border: 1px solid $color-transparent;
     border-radius: 100px;
     background: $color-control;
@@ -1034,6 +1180,31 @@ a {
     width: 32px;
     height: 32px;
     display: block;
+}
+
+.image-preview-canvas .expected-output {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.image-preview-canvas .expected-output img,
+.image-preview-canvas > div:has(img[alt='Generated result']) img {
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    object-fit: contain;
+}
+
+.expected-output span {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.62);
+    color: $color-white;
+    font-size: 11px;
 }
 
 .image-preview-canvas strong {

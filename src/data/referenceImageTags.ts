@@ -16,3 +16,12 @@ export const referenceImageTags: readonly ReferenceImageTag[] = [
     { id: 'light-atmosphere', en: 'Light & Atmosphere', chs: '光影氛围' },
     { id: 'image-style', en: 'Image Style', chs: '图像风格' },
 ] as const;
+
+export const referenceImageTagPayloadValues: Readonly<Record<string, string>> = {
+    'design-techniques': 'design_language',
+    'facade-design': 'facade_or_interface',
+    'materials-construction': 'material',
+    'site-landscaping': 'surrounding_context',
+    'light-atmosphere': 'lighting_atmosphere',
+    'image-style': 'visualization_style',
+};
