@@ -71,6 +71,7 @@ const caseAsset = (
         return tag ? [tag.id] : [];
     }),
     uploadStatus: 'success',
+    sourceType: 'template',
 });
 
 export const caseToFormAssets = (item: ManifestCase) => ({
@@ -88,3 +89,26 @@ export const caseToFormAssets = (item: ManifestCase) => ({
     ].filter((image): image is UploadedImage => Boolean(image)),
     expectedOutput: item.expectedOutput,
 });
+
+const resolveLocalAsset = (url: string) =>
+    new Promise<void>((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error(`Unable to load template asset: ${url}`));
+        image.src = url;
+    });
+
+export const loadTemplateCase = async (caseId: string) => {
+    const item = getV3Case(caseId);
+    if (!item) throw new Error('Unable to load template. The case was not found.');
+    const assets = caseToFormAssets(item);
+    const urls = [
+        assets.baseImage?.previewUrl,
+        ...assets.referenceImages.map((image) => image.previewUrl),
+        assets.expectedOutput,
+    ].filter((url): url is string => Boolean(url));
+    await Promise.all(urls.map(resolveLocalAsset));
+    const baseImageType = normalizeV3Category(item.type);
+    if (!baseImageType) throw new Error('Unable to load template. Its image type is unsupported.');
+    return { ...assets, baseImageType, prompt: '' };
+};

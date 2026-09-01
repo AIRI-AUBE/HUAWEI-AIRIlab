@@ -1,154 +1,48 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CreativeRefinementPreview } from '../components/CreativeRefinementPreview';
 import { ImageUploadField } from '../components/ImageUploadField';
 import { OptionGrid, RefinementSection } from '../components/RefinementControls';
 import { ReferenceImageTagSelector } from '../components/ReferenceImageTagSelector';
 import { V3TemplateSelector } from '../components/V3TemplateSelector';
 import options from '../data/imageToImageOptions.json';
-import {
-    caseToFormAssets,
-    getV3Case,
-    v3Templates,
-    type BaseImageType,
-    type V3Template,
-} from '../data/v3/cases';
-import { generate, waitForResult } from '../features/generation/universalGeneration';
-import { mapWorkflow44Payload } from '../features/generation/workflow44';
-import {
-    disposeUploadedImage,
-    errorMessage,
-    runImageUploadPipeline,
-} from '../features/imageUpload/pipeline';
-import type { UploadedImage, UploadStatus } from '../features/imageUpload/types';
-
-type V3FormState = {
-    baseImageType: BaseImageType;
-    baseImage?: UploadedImage;
-    referenceImages: UploadedImage[];
-    prompt: string;
-};
+import { v3Templates } from '../data/v3/cases';
+import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
+import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
 
 export function ImageToImagePage() {
     const { t, i18n } = useTranslation();
     const language = i18n.language.startsWith('chs') ? 'chs' : 'en';
-    const [form, setForm] = useState<V3FormState>({
-        baseImageType: 'architecture',
-        referenceImages: [],
-        prompt: '',
-    });
-    const [activeReference, setActiveReference] = useState(0);
-    const [templateOpen, setTemplateOpen] = useState(false);
-    const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
-    const [expectedOutput, setExpectedOutput] = useState('');
-    const [baseStatus, setBaseStatus] = useState<UploadStatus>('idle');
-    const [baseError, setBaseError] = useState('');
-    const [referenceError, setReferenceError] = useState('');
-    const [generating, setGenerating] = useState(false);
-    const [generationError, setGenerationError] = useState('');
-    const [resultUrl, setResultUrl] = useState('');
-
-    useEffect(
-        () => () => {
-            if (form.baseImage) disposeUploadedImage(form.baseImage);
-            form.referenceImages.forEach(disposeUploadedImage);
-        },
-        [],
-    );
-
-    const addBase = async (files: File[]) => {
-        if (!files[0]) return;
-        setBaseError('');
-        try {
-            const image = await runImageUploadPipeline(files[0], 'base-image', setBaseStatus);
-            setForm((current) => {
-                disposeUploadedImage(current.baseImage);
-                return { ...current, baseImage: image };
-            });
-        } catch (error) {
-            setBaseStatus('error');
-            setBaseError(errorMessage(error));
-        }
-    };
-
-    const addReferences = async (files: File[]) => {
-        const available = Math.max(0, 3 - form.referenceImages.length);
-        setReferenceError(
-            files.length > available ? 'Workflow 44 accepts at most three reference images.' : '',
-        );
-        for (const file of files.slice(0, available)) {
-            try {
-                const image = await runImageUploadPipeline(file, 'reference-image');
-                setForm((current) => ({
-                    ...current,
-                    referenceImages: [...current.referenceImages, image],
-                }));
-            } catch (error) {
-                setReferenceError(`${file.name}: ${errorMessage(error)}`);
-            }
-        }
-    };
-
-    const removeReference = (index: number) =>
-        setForm((current) => {
-            disposeUploadedImage(current.referenceImages[index]);
-            const next = current.referenceImages.filter((_, itemIndex) => itemIndex !== index);
-            setActiveReference((value) => Math.max(0, Math.min(value, next.length - 1)));
-            return { ...current, referenceImages: next };
-        });
-
-    const selectBaseImageType = (baseImageType: string) => {
-        setForm((current) => ({ ...current, baseImageType: baseImageType as BaseImageType }));
-        setSelectedTemplateId(undefined);
-        setExpectedOutput('');
-        setTemplateOpen(false);
-    };
-
-    const selectTemplate = (template: V3Template) => {
-        const selectedCase = getV3Case(template.caseId);
-        if (!selectedCase) return;
-        const assets = caseToFormAssets(selectedCase);
-        setForm((current) => {
-            if (current.baseImage?.file) disposeUploadedImage(current.baseImage);
-            current.referenceImages.filter((image) => image.file).forEach(disposeUploadedImage);
-            return {
-                ...current,
-                baseImageType: template.baseImageType,
-                baseImage: assets.baseImage,
-                referenceImages: assets.referenceImages,
-            };
-        });
-        setBaseStatus(assets.baseImage ? 'success' : 'idle');
-        setBaseError('');
-        setReferenceError('');
-        setActiveReference(0);
-        setSelectedTemplateId(template.id);
-        setExpectedOutput(assets.expectedOutput);
-        setTemplateOpen(false);
-    };
-
-    const startGeneration = async () => {
-        if (!form.baseImage) return;
-        setGenerating(true);
-        setGenerationError('');
-        try {
-            const payload = mapWorkflow44Payload({
-                baseImage: form.baseImage,
-                referenceImages: form.referenceImages,
-                imageType: form.baseImageType,
-                prompt: form.prompt,
-            });
-            const result = await waitForResult(await generate(payload));
-            const url = result.outputs.find((output) => typeof output.url === 'string')?.url;
-            if (!url) throw new Error('Generation completed without an output image.');
-            setResultUrl(url);
-        } catch (error) {
-            setGenerationError(error instanceof Error ? error.message : 'Generation failed.');
-        } finally {
-            setGenerating(false);
-        }
-    };
+    const {
+        form,
+        setForm,
+        activeReference,
+        setActiveReference,
+        templateOpen,
+        setTemplateOpen,
+        selectedTemplateId,
+        baseStatus,
+        baseError,
+        referenceError,
+        referenceStatus,
+        referenceLoadingCount,
+        templateStatus,
+        templateError,
+        loadingTemplateId,
+        generationStatus,
+        generationError,
+    } = useCreativeRefinement();
+    const actions = useCreativeRefinementActions();
 
     const activeTags = form.referenceImages[activeReference]?.tags ?? [];
+    const filteredTemplates = v3Templates.filter(
+        (template) => template.baseImageType === form.baseImageType,
+    );
+    const templateLoading = templateStatus === 'loading';
+    const baseLoading =
+        !form.baseImage &&
+        (templateLoading || baseStatus === 'validating' || baseStatus === 'uploading');
+    const referenceLoading = referenceStatus === 'validating' || referenceStatus === 'uploading';
+    const generating = ['validating', 'submitting', 'generating'].includes(generationStatus);
     return (
         <main className="image-workspace">
             <aside className="refinement-panel">
@@ -157,10 +51,16 @@ export function ImageToImagePage() {
                     <V3TemplateSelector
                         open={templateOpen}
                         selectedId={selectedTemplateId}
-                        templates={v3Templates}
+                        templates={filteredTemplates}
                         onOpenChange={setTemplateOpen}
-                        onSelect={selectTemplate}
+                        onSelect={actions.selectTemplate}
+                        loadingId={loadingTemplateId}
                     />
+                    {templateError && (
+                        <p className="template-error" role="alert">
+                            {templateError}
+                        </p>
+                    )}
                     <RefinementSection
                         title={t('imageToImage.baseHeading')}
                         className="refinement-section--base"
@@ -170,23 +70,24 @@ export function ImageToImagePage() {
                             eyebrow={options.baseUploadEyebrow[language]}
                             icon="/assets/figma/upload.svg"
                             images={form.baseImage ? [form.baseImage.previewUrl] : []}
-                            onImages={addBase}
-                            onRemove={() =>
-                                setForm((current) => {
-                                    disposeUploadedImage(current.baseImage);
-                                    setBaseStatus('idle');
-                                    setBaseError('');
-                                    return { ...current, baseImage: undefined };
-                                })
-                            }
+                            onImages={actions.addBase}
+                            onRemove={actions.removeBase}
                             statusText={
                                 baseStatus === 'validating'
-                                    ? 'Validating image…'
+                                    ? t('imageToImage.validating')
                                     : baseStatus === 'uploading'
-                                      ? 'Uploading image…'
+                                      ? t('imageToImage.uploading')
                                       : undefined
                             }
                             error={baseError}
+                            loadingCount={baseLoading ? 1 : 0}
+                            loadingText={
+                                templateLoading
+                                    ? t('imageToImage.loadingTemplate')
+                                    : baseStatus === 'validating'
+                                      ? t('imageToImage.validating')
+                                      : t('imageToImage.uploading')
+                            }
                         />
                         <p className="control-label">{t('imageToImage.baseType')}</p>
                         <OptionGrid
@@ -194,7 +95,7 @@ export function ImageToImagePage() {
                             options={options.baseTypes}
                             language={language}
                             selected={[form.baseImageType]}
-                            onToggle={selectBaseImageType}
+                            onToggle={actions.selectBaseImageType}
                         />
                     </RefinementSection>
                     <RefinementSection
@@ -208,10 +109,18 @@ export function ImageToImagePage() {
                             maxImages={3}
                             images={form.referenceImages.map((image) => image.previewUrl)}
                             activeIndex={activeReference}
-                            onImages={addReferences}
+                            onImages={actions.addReferences}
                             onSelect={setActiveReference}
-                            onRemove={removeReference}
+                            onRemove={actions.removeReference}
                             error={referenceError}
+                            loadingCount={referenceLoadingCount}
+                            loadingText={
+                                templateLoading
+                                    ? t('imageToImage.loadingTemplate')
+                                    : referenceLoading
+                                      ? t('imageToImage.uploading')
+                                      : undefined
+                            }
                         />
                         <p className="control-label control-label--tags">
                             {t('imageToImage.tags')}
@@ -246,10 +155,17 @@ export function ImageToImagePage() {
                 <button
                     className="refinement-generate"
                     type="button"
-                    disabled={!form.baseImage || baseStatus !== 'success' || generating}
-                    onClick={startGeneration}
+                    disabled={
+                        !form.baseImage ||
+                        baseStatus !== 'success' ||
+                        templateLoading ||
+                        referenceLoading ||
+                        referenceLoadingCount > 0 ||
+                        generating
+                    }
+                    onClick={actions.startGeneration}
                 >
-                    {generating ? 'Generating…' : t('imageToImage.generate')}
+                    {generating ? t('imageToImage.generating') : t('imageToImage.generate')}
                 </button>
                 {generationError && (
                     <p className="generation-error" role="alert">
@@ -257,34 +173,7 @@ export function ImageToImagePage() {
                     </p>
                 )}
             </aside>
-            <section className="image-preview-panel">
-                <header>
-                    <h2>{t('imageToImage.preview')}</h2>
-                    <p>{t('imageToImage.previewDescription')}</p>
-                </header>
-                <div className="image-preview-canvas">
-                    <div className={expectedOutput && !resultUrl ? 'expected-output' : ''}>
-                        <img
-                            src={
-                                resultUrl ||
-                                expectedOutput ||
-                                '/assets/figma/image-placeholder-large.svg'
-                            }
-                            alt={
-                                resultUrl
-                                    ? 'Generated result'
-                                    : expectedOutput
-                                      ? 'Expected template output'
-                                      : ''
-                            }
-                        />
-                        {!resultUrl && !expectedOutput && (
-                            <strong>{t('imageToImage.previewDescription')}</strong>
-                        )}
-                        {!resultUrl && expectedOutput && <span>Expected output</span>}
-                    </div>
-                </div>
-            </section>
+            <CreativeRefinementPreview />
         </main>
     );
 }

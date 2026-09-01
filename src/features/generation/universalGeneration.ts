@@ -50,7 +50,11 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
         Object.assign(error, { status: response.status });
         throw error;
     }
-    return response.json() as Promise<T>;
+    const body = (await response.json()) as { status?: number; message?: string; data?: T } & T;
+    if (body.status && body.status !== 200) {
+        throw new Error(body.message || `Generation request failed (${body.status}).`);
+    }
+    return (body.data ?? body) as T;
 };
 
 export const generate = async (payload: Workflow44Payload, signal?: AbortSignal) => {

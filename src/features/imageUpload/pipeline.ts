@@ -23,11 +23,30 @@ export const runImageUploadPipeline = async (
         id: createId(),
         url: uploaded.url,
         mediaId: uploaded.mediaId,
-        previewUrl: URL.createObjectURL(file),
+        previewUrl: uploaded.url,
         tags: [],
         uploadStatus: 'success',
         file,
+        sourceType: 'user-upload',
     };
+};
+
+export const runTemplateImageUploadPipeline = async (
+    assetUrl: string,
+    role: ImageRole,
+    onProgress?: UploadProgress,
+    signal?: AbortSignal,
+): Promise<UploadedImage> => {
+    const response = await fetch(assetUrl, { signal });
+    if (!response.ok) throw new Error(`Unable to load template asset (${response.status}).`);
+    const blob = await response.blob();
+    const extension =
+        blob.type === 'image/png' ? 'png' : blob.type === 'image/jpeg' ? 'jpg' : 'webp';
+    const file = new File([blob], `template-${role}.${extension}`, {
+        type: blob.type || 'image/webp',
+    });
+    const uploaded = await runImageUploadPipeline(file, role, onProgress, signal);
+    return { ...uploaded, sourceType: 'template' };
 };
 
 export const errorMessage = (error: unknown) =>

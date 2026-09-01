@@ -12,4 +12,13 @@ export type Workflow44Payload = {
 };
 
 export type JobState = { status: string; message?: string };
-export type GenerationResult = { outputs: Array<{ url: string; [key: string]: unknown }> };
+export type GenerationOutput = {
+    mediaId?: number | string;
+    url: string;
+    thumbnail?: string;
+    width?: number;
+    height?: number;
+    createdAt?: string;
+    [key: string]: unknown;
+};
+export type GenerationResult = { outputs: GenerationOutput[] };

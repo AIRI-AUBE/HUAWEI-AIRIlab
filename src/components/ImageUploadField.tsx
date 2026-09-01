@@ -14,6 +14,8 @@ type Props = {
     onRemove: (index: number) => void;
     statusText?: string;
     error?: string;
+    loadingCount?: number;
+    loadingText?: string;
 };
 
 export function ImageUploadField({
@@ -29,10 +31,14 @@ export function ImageUploadField({
     onRemove,
     statusText,
     error,
+    loadingCount = 0,
+    loadingText,
 }: Props) {
     const { t } = useTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
+    const showAddButton = multiple && images.length + loadingCount < maxImages;
+    const visibleItemCount = images.length + loadingCount + (showAddButton ? 1 : 0);
     const accept = (files: File[]) =>
         onImages(files.filter((file) => file.type.startsWith('image/')));
     const drop = (event: DragEvent<HTMLDivElement>) => {
@@ -69,6 +75,7 @@ export function ImageUploadField({
                 }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={drop}
+                aria-busy={loadingCount > 0}
             >
                 <input
                     ref={inputRef}
@@ -81,9 +88,9 @@ export function ImageUploadField({
                         event.target.value = '';
                     }}
                 />
-                {images.length ? (
+                {images.length || loadingCount ? (
                     <div
-                        className={`image-upload__previews${images.length >= 3 ? ' image-upload__previews--compact' : ''}`}
+                        className={`image-upload__previews${visibleItemCount >= 3 ? ' image-upload__previews--compact' : ''}`}
                     >
                         {images.map((src, index) => (
                             <button
@@ -118,7 +125,18 @@ export function ImageUploadField({
                                 </span>
                             </button>
                         ))}
-                        {multiple && images.length < maxImages && (
+                        {Array.from({ length: loadingCount }, (_, index) => (
+                            <div
+                                className="upload-preview upload-preview--skeleton"
+                                key={`loading-${index}`}
+                            >
+                                <span className="image-skeleton" aria-hidden="true" />
+                                {loadingText && (
+                                    <span className="image-skeleton__text">{loadingText}</span>
+                                )}
+                            </div>
+                        ))}
+                        {showAddButton && (
                             <span className="upload-preview__add" aria-hidden="true">
                                 +
                             </span>

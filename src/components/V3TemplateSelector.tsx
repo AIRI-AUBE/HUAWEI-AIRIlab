@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import type { BaseImageType, V3Template } from '../data/v3/cases';
 
 type Props = {
@@ -8,17 +9,20 @@ type Props = {
     templates: V3Template[];
     onOpenChange: (open: boolean) => void;
     onSelect: (template: V3Template) => void;
+    loadingId?: string;
 };
 
-const typeLabels: Record<BaseImageType, string> = {
-    architecture: 'Architecture',
-    interior: 'Interior',
-    landscape: 'Landscape',
-    urban: 'Planning',
-};
 const typeOrder: BaseImageType[] = ['architecture', 'interior', 'landscape', 'urban'];
 
-export function V3TemplateSelector({ open, selectedId, templates, onOpenChange, onSelect }: Props) {
+export function V3TemplateSelector({
+    open,
+    selectedId,
+    templates,
+    onOpenChange,
+    onSelect,
+    loadingId,
+}: Props) {
+    const { t } = useTranslation();
     const rootRef = useRef<HTMLDivElement>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -63,7 +67,7 @@ export function V3TemplateSelector({ open, selectedId, templates, onOpenChange, 
                 onClick={() => onOpenChange(!open)}
             >
                 <img src="/assets/figma/template-icon.svg" alt="" />
-                <span>Template</span>
+                <span>{t('imageToImage.template')}</span>
                 <img src="/assets/figma/menu-chevron.svg" alt="" />
             </button>
             {open &&
@@ -71,27 +75,33 @@ export function V3TemplateSelector({ open, selectedId, templates, onOpenChange, 
                     <div
                         className="template-popover"
                         role="dialog"
-                        aria-label="Choose a template"
+                        aria-label={t('imageToImage.chooseTemplate')}
                         ref={popoverRef}
                         style={{ top: position.top, left: position.left }}
                     >
                         {typeOrder.map((type) => {
-                            const group = templates.filter(
-                                (template) => template.baseImageType === type,
-                            );
-                            if (!group.length) return null;
+                            // const group = templates.filter(
+                            //     (template) => template.baseImageType === type,
+                            // );
+                            if (!templates.length) return null;
                             return (
                                 <section className="template-group" key={type}>
-                                    <h2>{typeLabels[type]}</h2>
+                                    <h2>{t(`imageToImage.types.${type}`)}</h2>
                                     <div className="template-group__grid">
-                                        {group.map((template) => (
+                                        {templates.map((template, index) => (
                                             <button
                                                 key={template.id}
                                                 type="button"
-                                                title={template.title}
-                                                aria-label={template.title}
+                                                title={t('imageToImage.templateNumber', {
+                                                    number: index + 1,
+                                                })}
+                                                aria-label={t('imageToImage.templateNumber', {
+                                                    number: index + 1,
+                                                })}
                                                 className={`template-card${selectedId === template.id ? ' template-card--selected' : ''}`}
                                                 onClick={() => onSelect(template)}
+                                                disabled={Boolean(loadingId)}
+                                                aria-busy={loadingId === template.id}
                                             >
                                                 <img
                                                     src={template.thumbnail}
@@ -101,7 +111,11 @@ export function V3TemplateSelector({ open, selectedId, templates, onOpenChange, 
                                                     height="92"
                                                 />
                                                 <span className="template-card__label">
-                                                    Template {group.indexOf(template) + 1}
+                                                    {loadingId === template.id
+                                                        ? t('imageToImage.loadingShort')
+                                                        : t('imageToImage.templateNumber', {
+                                                              number: index + 1,
+                                                          })}
                                                 </span>
                                             </button>
                                         ))}

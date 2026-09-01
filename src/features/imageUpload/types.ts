@@ -11,6 +11,7 @@ export type UploadedImage = {
     uploadStatus: UploadStatus;
     error?: string;
     file?: File;
+    sourceType: 'template' | 'user-upload';
 };
 
 export type UploadProgress = (status: UploadStatus) => void;

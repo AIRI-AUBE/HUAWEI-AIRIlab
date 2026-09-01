@@ -42,6 +42,23 @@
         "promptTemplatesDialog": "提示词模板"
     },
     "imageToImage": {
+        "loadingTemplate": "\u6b63\u5728\u52a0\u8f7d\u6a21\u677f...",
+        "uploading": "\u6b63\u5728\u4e0a\u4f20\u56fe\u7247...",
+        "validating": "\u6b63\u5728\u9a8c\u8bc1\u56fe\u7247...",
+        "templateError": "\u65e0\u6cd5\u52a0\u8f7d\u6a21\u677f\u3002",
+        "chooseTemplate": "选择模板",
+        "templateNumber": "模板 {{number}}",
+        "loadingShort": "加载中...",
+        "generating": "生成中...",
+        "generationFailed": "生成失败。",
+        "expectedOutput": "预期效果",
+        "tooManyReferences": "最多允许上传三张参考图片。",
+        "types": {
+            "architecture": "建筑",
+            "interior": "室内",
+            "landscape": "景观",
+            "urban": "规划"
+        },
         "title": "创意推敲（AIRIIab V3）",
         "template": "模板",
         "baseHeading": "1. 上传底图",

@@ -61,6 +61,23 @@
         "previewDescription": "Generated images will appear here",
         "referenceImageLabel": "Reference image {{number}}",
         "imageLabel": "Image {{number}}",
-        "removeImageLabel": "Remove image {{number}}"
+        "removeImageLabel": "Remove image {{number}}",
+        "loadingTemplate": "Loading template...",
+        "uploading": "Uploading image...",
+        "validating": "Validating image...",
+        "templateError": "Unable to load template.",
+        "chooseTemplate": "Choose a template",
+        "templateNumber": "Template {{number}}",
+        "loadingShort": "Loading...",
+        "generating": "Generating...",
+        "generationFailed": "Generation failed.",
+        "expectedOutput": "Expected output",
+        "tooManyReferences": "A maximum of three reference images is allowed.",
+        "types": {
+            "architecture": "Architecture",
+            "interior": "Interior",
+            "landscape": "Landscape",
+            "urban": "Planning"
+        }
     }
 }
