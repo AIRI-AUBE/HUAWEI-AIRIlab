@@ -80,15 +80,15 @@ export function V3TemplateSelector({
                         style={{ top: position.top, left: position.left }}
                     >
                         {typeOrder.map((type) => {
-                            // const group = templates.filter(
-                            //     (template) => template.baseImageType === type,
-                            // );
-                            if (!templates.length) return null;
+                            const group = templates.filter(
+                                (template) => template.baseImageType === type,
+                            );
+                            if (!group.length) return null;
                             return (
                                 <section className="template-group" key={type}>
                                     <h2>{t(`imageToImage.types.${type}`)}</h2>
                                     <div className="template-group__grid">
-                                        {templates.map((template, index) => (
+                                        {group.map((template, index) => (
                                             <button
                                                 key={template.id}
                                                 type="button"

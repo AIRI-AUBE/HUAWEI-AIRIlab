@@ -34,9 +34,6 @@ export function ImageToImagePage() {
     const actions = useCreativeRefinementActions();
 
     const activeTags = form.referenceImages[activeReference]?.tags ?? [];
-    const filteredTemplates = v3Templates.filter(
-        (template) => template.baseImageType === form.baseImageType,
-    );
     const templateLoading = templateStatus === 'loading';
     const baseLoading =
         !form.baseImage &&
@@ -51,7 +48,7 @@ export function ImageToImagePage() {
                     <V3TemplateSelector
                         open={templateOpen}
                         selectedId={selectedTemplateId}
-                        templates={filteredTemplates}
+                        templates={v3Templates}
                         onOpenChange={setTemplateOpen}
                         onSelect={actions.selectTemplate}
                         loadingId={loadingTemplateId}
