@@ -104,6 +104,7 @@ export function useCreativeRefinementActions() {
         if (!selectedCase) return;
         state.setLoadingTemplateId(template.id);
         state.setTemplateStatus('loading');
+        state.setTemplateOpen(false);
         state.setTemplateError('');
         state.setBaseStatus('idle');
         state.setReferenceLoadingCount(
@@ -171,7 +172,6 @@ export function useCreativeRefinementActions() {
             state.setBaseError('');
             state.setReferenceError('');
             state.setActiveReference(0);
-            state.setTemplateOpen(false);
         } catch (error) {
             state.setTemplateStatus('error');
             state.setTemplateError(

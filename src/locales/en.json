@@ -42,6 +42,9 @@
         "voice": "Record prompt",
         "refresh": "Clear prompt",
         "start": "Start Creating",
+        "generating": "Generating...",
+        "generationFailed": "Generation failed.",
+        "generatedImageAlt": "Generated image",
         "closeTemplates": "Close prompt templates",
         "promptTemplatesDialog": "Prompt templates"
     },

@@ -1,20 +1,75 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { defaultPromptTemplates, type PromptTemplate } from '../data/prompts';
 import { PromptTemplateModal } from '../components/PromptTemplateModal';
+import { generate, waitForResult } from '../features/generation/universalGeneration';
+import { mapWorkflow44Payload } from '../features/generation/workflow44';
+import type { GenerationOutput } from '../features/generation/types';
+
+type GenerationStatus = 'idle' | 'submitting' | 'generating' | 'completed' | 'failed';
 
 export function TextToImagePage() {
     const { t, i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [prompt, setPrompt] = useState('');
+    const [generationStatus, setGenerationStatus] = useState<GenerationStatus>('idle');
+    const [generationError, setGenerationError] = useState('');
+    const [output, setOutput] = useState<GenerationOutput>();
     const controlsRef = useRef<HTMLDivElement>(null);
+    const generationLock = useRef(false);
+    const generationAbort = useRef<AbortController | undefined>(undefined);
     const language: 'en' | 'chs' = i18n.language.startsWith('chs') ? 'chs' : 'en';
     const closeModal = useCallback(() => setIsOpen(false), []);
     const selectPrompt = (template: PromptTemplate) => {
         setSelectedId(template.id);
         setPrompt(template[language]);
         setIsOpen(false);
+    };
+    const generating = generationStatus === 'submitting' || generationStatus === 'generating';
+
+    useEffect(() => () => generationAbort.current?.abort(), []);
+
+    const startGeneration = async () => {
+        const submittedPrompt = prompt.trim();
+        if (!submittedPrompt || generationLock.current) return;
+
+        generationLock.current = true;
+        generationAbort.current?.abort();
+        const controller = new AbortController();
+        generationAbort.current = controller;
+        setGenerationError('');
+        setOutput(undefined);
+
+        try {
+            const payload = mapWorkflow44Payload({
+                prompt: submittedPrompt,
+                referenceImages: [],
+            });
+            setGenerationStatus('submitting');
+            const jobId = await generate(payload, controller.signal);
+            setGenerationStatus('generating');
+            const result = await waitForResult(jobId, { signal: controller.signal });
+            const generatedOutput = (result.outputs ?? []).find(
+                (item) => typeof item.url === 'string' && item.url.length > 0,
+            );
+            if (!generatedOutput) {
+                throw new Error('Generation completed without an output image.');
+            }
+            setOutput(generatedOutput);
+            setGenerationStatus('completed');
+        } catch (error) {
+            if (controller.signal.aborted) return;
+            setGenerationStatus('failed');
+            setGenerationError(
+                error instanceof Error ? error.message : t('textToImage.generationFailed'),
+            );
+        } finally {
+            if (generationAbort.current === controller) {
+                generationAbort.current = undefined;
+                generationLock.current = false;
+            }
+        }
     };
 
     return (
@@ -25,13 +80,31 @@ export function TextToImagePage() {
                     <p>{t('textToImage.previewDescription')}</p>
                 </div>
                 <div className="preview-canvas">
-                    <div className="preview-placeholder">
-                        <img
-                            className="image-placeholder-icon"
-                            src="/assets/figma/preview-placeholder.svg"
-                            alt=""
-                        />
-                        <strong>{t('textToImage.previewDescription')}</strong>
+                    <div
+                        className={`preview-placeholder${output ? ' preview-placeholder--result' : ''}${generating ? ' generation-preview--loading' : ''}`}
+                    >
+                        {generating && <span className="image-skeleton" aria-hidden="true" />}
+                        {output ? (
+                            <img
+                                className="text-generation-output"
+                                src={output.thumbnail || output.url}
+                                alt={t('textToImage.generatedImageAlt')}
+                            />
+                        ) : !generating ? (
+                            <>
+                                <img
+                                    className="image-placeholder-icon"
+                                    src="/assets/figma/preview-placeholder.svg"
+                                    alt=""
+                                />
+                                <strong>{t('textToImage.previewDescription')}</strong>
+                            </>
+                        ) : null}
+                        {generating && (
+                            <span className="generation-preview__status">
+                                {t('textToImage.generating')}
+                            </span>
+                        )}
                     </div>
                 </div>
             </section>
@@ -91,10 +164,20 @@ export function TextToImagePage() {
                     </div>
                     {/* <button type="button" className="square-control square-control--refresh" aria-label={t('textToImage.refresh')} onClick={() => { setPrompt(''); setSelectedId(null); }}><img className="refresh-icon" src="/assets/figma/refresh.svg" alt="" /></button> */}
                 </div>
-                <button type="button" className="generate-button">
+                <button
+                    type="button"
+                    className="generate-button"
+                    disabled={!prompt.trim() || generating}
+                    onClick={startGeneration}
+                >
                     <img src="/assets/figma/sparkles.svg" alt="" />
-                    {t('textToImage.start')}
+                    {generating ? t('textToImage.generating') : t('textToImage.start')}
                 </button>
+                {generationError && (
+                    <p className="text-generation-error" role="alert">
+                        {generationError}
+                    </p>
+                )}
             </section>
         </main>
     );

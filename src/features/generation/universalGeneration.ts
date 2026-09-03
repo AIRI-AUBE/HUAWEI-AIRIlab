@@ -36,7 +36,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     const apiKey = import.meta.env.VITE_AIRI_API_KEY;
     const authToken = import.meta.env.VITE_AIRI_AUTH_TOKEN;
     const response = await fetch(`${baseUrl()}${path}`, {
-        credentials: 'include',
+        credentials: 'omit',
         ...init,
         headers: {
             'Content-Type': 'application/json',

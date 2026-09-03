@@ -38,6 +38,9 @@
         "voice": "录制提示词",
         "refresh": "清空提示词",
         "start": "开始创作",
+        "generating": "生成中...",
+        "generationFailed": "生成失败。",
+        "generatedImageAlt": "生成的图片",
         "closeTemplates": "关闭提示词模板",
         "promptTemplatesDialog": "提示词模板"
     },

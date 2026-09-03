@@ -14,7 +14,9 @@ export function CreativeRefinementPreview() {
                 <p>{t('imageToImage.previewDescription')}</p>
             </header>
             <div className="image-preview-canvas">
-                <div className={generating ? 'generation-preview--loading' : ''}>
+                <div
+                    className={`${primaryOutput ? 'generation-preview--result' : ''}${generating ? ' generation-preview--loading' : ''}`}
+                >
                     {generating && <span className="image-skeleton" aria-hidden="true" />}
                     <img
                         src={
