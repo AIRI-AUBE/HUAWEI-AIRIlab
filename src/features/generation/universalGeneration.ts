@@ -80,15 +80,15 @@ export const waitForResult = async (
         const status = job.status.trim().toLowerCase();
         if (failureStates.has(status)) throw new Error(job.message || 'Generation failed.');
         if (successStates.has(status)) {
-            for (let attempt = 0; attempt < 4; attempt += 1) {
+            for (let attempt = 0; attempt < 6; attempt += 1) {
                 try {
                     return await request<GenerationResult>(
                         `/api/Universal/Job/${encodeURIComponent(jobId)}/result`,
                         { signal: options.signal },
                     );
                 } catch (error) {
-                    if ((error as { status?: number }).status !== 404 || attempt === 3) throw error;
-                    await delay(2000, options.signal);
+                    if ((error as { status?: number }).status !== 404 || attempt === 5) throw error;
+                    await delay(3000, options.signal);
                 }
             }
         }

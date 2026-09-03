@@ -1,14 +1,16 @@
-export type Workflow44Reference = { url: string; tags?: string[] };
+export type Workflow44Reference = { url: string };
 
 export type Workflow44Payload = {
     workflowId: '44';
     workflowVersion: 'V3';
-    projectId: string;
-    teamId: string;
-    baseImage: string;
-    imageType: string;
+    projectId: number;
+    teamId: number;
     prompt: string;
+    aspectRatio: '16:9';
+    orientation: 0;
+    imageRatio: 3;
     referenceImage: Workflow44Reference[];
+    language: 'chs';
 };
 
 export type JobState = { status: string; message?: string };

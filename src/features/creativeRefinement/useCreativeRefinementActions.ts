@@ -192,9 +192,7 @@ export function useCreativeRefinementActions() {
         state.setJobId('');
         try {
             const payload = mapWorkflow44Payload({
-                baseImage: state.form.baseImage,
                 referenceImages: state.form.referenceImages,
-                imageType: state.form.baseImageType,
                 prompt: state.form.prompt,
             });
             state.setGenerationStatus('submitting');

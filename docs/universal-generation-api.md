@@ -20,14 +20,17 @@ Generation submits `POST /api/Universal/Generate` with JSON shaped as follows:
     "workflowVersion": "V3",
     "projectId": "<current-project-id>",
     "teamId": "<current-team-id>",
-    "baseImage": "https://<persisted-upload-url>",
-    "imageType": "architecture",
     "prompt": "<prompt>",
-    "referenceImage": [{ "url": "https://<persisted-reference-url>", "tags": ["facade_or_interface"] }]
+    "aspectRatio": "16:9",
+    "orientation": 0,
+    "imageRatio": 3,
+    "referenceImage": [{ "url": "https://<persisted-reference-url>" }],
+    "language": "chs"
 }
 ```
 
-`referenceImage` supports zero through three entries. Local object URLs are preview-only and are never submitted.
+`projectId` and `teamId` are submitted as numbers sourced from the environment. `referenceImage` supports zero through
+three entries, and each entry contains only an HTTPS `url`. Local object URLs are preview-only and are never submitted.
 
 ## Polling and results
 
@@ -38,7 +41,7 @@ are `failed`, `failed-content`, `video_generation_failed`, `error`, `interrupted
 All other statuses—including queued, prompt, generation, send, reduction, upload, and file-obtained states—remain non-terminal.
 
 On success, the client requests `GET /api/Universal/Job/:jobId/result`. A 404 can mean persisted media is not visible yet;
-the client retries that result request four times at two-second intervals before reporting the error.
+the client retries that result request six times at three-second intervals before reporting the error.
 
 ## HTTP errors
 

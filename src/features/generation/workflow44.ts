@@ -1,19 +1,18 @@
 import { workflow44Config } from '../imageUpload/config';
 import type { UploadedImage } from '../imageUpload/types';
-import { referenceImageTagPayloadValues } from '../../data/referenceImageTags';
 import type { Workflow44Payload } from './types';
 
 export const mapWorkflow44Payload = (input: {
-    baseImage: UploadedImage;
     referenceImages: UploadedImage[];
-    imageType: string;
     prompt: string;
-    projectId?: string;
-    teamId?: string;
+    projectId?: string | number;
+    teamId?: string | number;
 }): Workflow44Payload => {
-    const projectId = input.projectId ?? import.meta.env.VITE_AIRI_PROJECT_ID;
-    const teamId = input.teamId ?? import.meta.env.VITE_AIRI_TEAM_ID;
-    if (!projectId || !teamId) throw new Error('Project and team configuration is required.');
+    const projectId = Number(input.projectId ?? import.meta.env.VITE_AIRI_PROJECT_ID);
+    const teamId = Number(input.teamId ?? import.meta.env.VITE_AIRI_TEAM_ID);
+    if (!Number.isInteger(projectId) || projectId < 1 || !Number.isInteger(teamId) || teamId < 0) {
+        throw new Error('Valid numeric project and team configuration is required.');
+    }
     if (input.referenceImages.length > workflow44Config.maxReferenceImages) {
         throw new Error('Workflow 44 accepts at most three reference images.');
     }
@@ -22,14 +21,11 @@ export const mapWorkflow44Payload = (input: {
         workflowVersion: workflow44Config.workflowVersion,
         projectId,
         teamId,
-        baseImage: input.baseImage.url,
-        imageType: input.imageType,
         prompt: input.prompt,
-        referenceImage: input.referenceImages.map(({ url, tags }) => ({
-            url,
-            ...(tags.length
-                ? { tags: tags.map((tag) => referenceImageTagPayloadValues[tag] ?? tag) }
-                : {}),
-        })),
+        aspectRatio: '16:9',
+        orientation: 0,
+        imageRatio: 3,
+        referenceImage: input.referenceImages.map(({ url }) => ({ url })),
+        language: 'chs',
     };
 };
