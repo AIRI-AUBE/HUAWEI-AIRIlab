@@ -45,6 +45,7 @@ export function TextToImagePage() {
             const payload = mapWorkflow44Payload({
                 prompt: submittedPrompt,
                 referenceImages: [],
+                language,
             });
             setGenerationStatus('submitting');
             const jobId = await generate(payload, controller.signal);

@@ -18,6 +18,7 @@ export type V3FormState = {
     baseImage?: UploadedImage;
     referenceImages: UploadedImage[];
     prompt: string;
+    language: 'en' | 'chs';
 };
 
 export type GenerationStatus =
@@ -70,6 +71,7 @@ export function CreativeRefinementProvider({ children }: { children: ReactNode }
         baseImageType: 'architecture',
         referenceImages: [],
         prompt: '',
+        language: 'en',
     });
     const [activeReference, setActiveReference] = useState(0);
     const [templateOpen, setTemplateOpen] = useState(false);

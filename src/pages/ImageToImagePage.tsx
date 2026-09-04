@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreativeRefinementPreview } from '../components/CreativeRefinementPreview';
 import { ImageUploadField } from '../components/ImageUploadField';
@@ -32,6 +33,10 @@ export function ImageToImagePage() {
         generationError,
     } = useCreativeRefinement();
     const actions = useCreativeRefinementActions();
+
+    useEffect(() => {
+        setForm((current) => (current.language === language ? current : { ...current, language }));
+    }, [language, setForm]);
 
     const activeTags = form.referenceImages[activeReference]?.tags ?? [];
     const templateLoading = templateStatus === 'loading';

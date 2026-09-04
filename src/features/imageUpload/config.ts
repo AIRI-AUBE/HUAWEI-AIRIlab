@@ -16,7 +16,7 @@ const shared = {
 } as const;
 
 export const workflow44Config = {
-    workflowId: '44',
+    workflowId: 39,
     workflowVersion: 'V3',
     maxReferenceImages: 3,
     rules: {
