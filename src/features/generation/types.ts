@@ -58,6 +58,21 @@ export type Workflow44Payload = {
     language: 'en' | 'chs';
 };
 
+export type TextToImagePayload = {
+    workflowId: '44';
+    workflowVersion: 'V3';
+    projectId: number;
+    teamId: number;
+    prompt: string;
+    aspectRatio: '16:9';
+    orientation: 0;
+    imageRatio: 3;
+    referenceImage: [];
+    language: 'chs';
+};
+
+export type GenerationPayload = Workflow44Payload | TextToImagePayload;
+
 export type JobState = { status: string; message?: string };
 export type GenerationOutput = {
     mediaId?: number | string;

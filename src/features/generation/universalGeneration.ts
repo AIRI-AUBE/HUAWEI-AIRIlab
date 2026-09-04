@@ -1,4 +1,4 @@
-import type { GenerationResult, JobState, Workflow44Payload } from './types';
+import type { GenerationPayload, GenerationResult, JobState } from './types';
 
 const successStates = new Set([
     'completed',
@@ -57,7 +57,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     return (body.data ?? body) as T;
 };
 
-export const generate = async (payload: Workflow44Payload, signal?: AbortSignal) => {
+export const generate = async (payload: GenerationPayload, signal?: AbortSignal) => {
     const response = await request<{ jobId: string }>('/api/Universal/Generate', {
         method: 'POST',
         body: JSON.stringify(payload),

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { defaultPromptTemplates, type PromptTemplate } from '../data/prompts';
 import { PromptTemplateModal } from '../components/PromptTemplateModal';
 import { generate, waitForResult } from '../features/generation/universalGeneration';
-import { mapWorkflow44Payload } from '../features/generation/workflow44';
+import { mapTextToImagePayload } from '../features/generation/textToImage';
 import type { GenerationOutput } from '../features/generation/types';
 
 type GenerationStatus = 'idle' | 'submitting' | 'generating' | 'completed' | 'failed';
@@ -42,10 +42,8 @@ export function TextToImagePage() {
         setOutput(undefined);
 
         try {
-            const payload = mapWorkflow44Payload({
+            const payload = mapTextToImagePayload({
                 prompt: submittedPrompt,
-                referenceImages: [],
-                language,
             });
             setGenerationStatus('submitting');
             const jobId = await generate(payload, controller.signal);
