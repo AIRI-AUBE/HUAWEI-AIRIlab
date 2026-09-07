@@ -1,8 +1,10 @@
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { realpath, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const healthBody = JSON.stringify({ service: 'airi-display', status: 'ok' });
 
 const mimeTypes = new Map([
     ['.css', 'text/css; charset=utf-8'],
@@ -26,27 +28,31 @@ const isInside = (rootDir, candidate) => {
     return pathFromRoot === '' || (!pathFromRoot.startsWith(`..${sep}`) && pathFromRoot !== '..');
 };
 
-const sendFile = async (request, response, filePath) => {
-    const file = await stat(filePath);
+const sendFile = async (request, response, filePath, siteRoot) => {
+    const resolvedFilePath = await realpath(filePath);
+    if (!isInside(siteRoot, resolvedFilePath)) {
+        const error = new Error('File resolves outside the display root');
+        error.code = 'OUTSIDE_SITE_ROOT';
+        throw error;
+    }
+
+    const file = await stat(resolvedFilePath);
     if (!file.isFile()) throw new Error('Not a file');
 
     response.writeHead(200, {
         'Content-Length': file.size,
-        'Content-Type': mimeTypes.get(extname(filePath).toLowerCase()) ?? 'application/octet-stream',
+        'Content-Type':
+            mimeTypes.get(extname(resolvedFilePath).toLowerCase()) ?? 'application/octet-stream',
     });
     if (request.method === 'HEAD') {
         response.end();
         return;
     }
-    createReadStream(filePath).pipe(response);
+    createReadStream(resolvedFilePath).pipe(response);
 };
 
-export const startDisplayServer = async ({
-    rootDir,
-    host = '127.0.0.1',
-    port = 3000,
-}) => {
-    const siteRoot = resolve(rootDir);
+export const startDisplayServer = async ({ rootDir, host = '127.0.0.1', port = 3000 }) => {
+    const siteRoot = await realpath(resolve(rootDir));
     const indexPath = join(siteRoot, 'index.html');
     const server = createServer(async (request, response) => {
         if (request.method !== 'GET' && request.method !== 'HEAD') {
@@ -56,7 +62,18 @@ export const startDisplayServer = async ({
         }
 
         try {
-            const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
+            const pathname = decodeURIComponent(
+                new URL(request.url ?? '/', 'http://localhost').pathname,
+            );
+            if (pathname === '/__airi_display_health') {
+                response.writeHead(200, {
+                    'Cache-Control': 'no-store',
+                    'Content-Length': Buffer.byteLength(healthBody),
+                    'Content-Type': 'application/json; charset=utf-8',
+                });
+                response.end(request.method === 'HEAD' ? undefined : healthBody);
+                return;
+            }
             const requestedPath = resolve(siteRoot, `.${pathname}`);
             if (!isInside(siteRoot, requestedPath)) {
                 response.writeHead(403);
@@ -65,14 +82,24 @@ export const startDisplayServer = async ({
             }
 
             try {
-                await sendFile(request, response, pathname === '/' ? indexPath : requestedPath);
-            } catch {
+                await sendFile(
+                    request,
+                    response,
+                    pathname === '/' ? indexPath : requestedPath,
+                    siteRoot,
+                );
+            } catch (error) {
+                if (error.code === 'OUTSIDE_SITE_ROOT') {
+                    response.writeHead(403);
+                    response.end('Forbidden');
+                    return;
+                }
                 if (extname(pathname)) {
                     response.writeHead(404);
                     response.end('Not found');
                     return;
                 }
-                await sendFile(request, response, indexPath);
+                await sendFile(request, response, indexPath, siteRoot);
             }
         } catch (error) {
             response.writeHead(500);
@@ -95,10 +122,20 @@ const scriptPath = fileURLToPath(import.meta.url);
 const launchedDirectly = process.argv[1] && resolve(process.argv[1]) === scriptPath;
 
 if (launchedDirectly) {
-    const rootDir = resolve(dirname(scriptPath), 'dist');
-    const server = await startDisplayServer({ rootDir });
-    console.log('AIRI Display is running at http://localhost:3000');
-    console.log('Keep this window open. Press Ctrl+C to stop.');
+    const readArgument = (name, fallback) => {
+        const index = process.argv.indexOf(`--${name}`);
+        return index === -1 ? fallback : process.argv[index + 1];
+    };
+    const rootDir = resolve(readArgument('root', resolve(dirname(scriptPath), 'dist')));
+    const host = readArgument('host', '127.0.0.1');
+    const port = Number(readArgument('port', 3000));
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        throw new Error('Port must be an integer from 1 to 65535.');
+    }
+
+    const server = await startDisplayServer({ rootDir, host, port });
+    console.log(`AIRI Display is running at http://${host}:${port}`);
+    console.log('Keep this process running.');
 
     const stop = () => server.close(() => process.exit(0));
     process.once('SIGINT', stop);

@@ -18,8 +18,8 @@ the source code, npm install, or an .env file.
 3. Double-click start-display.cmd after the installer finishes. If the
    launcher says Node.js is unavailable, restart Windows once and retry.
 
-4. Keep the minimized "AIRI Display Server" window running. The website
-   opens at http://localhost:3000.
+4. The AIRI Display server runs in the background. The website opens at
+   http://localhost:3000. Double-click start-display.cmd again to reopen it.
 
 CHECKING THE INSTALL
 --------------------
@@ -57,8 +57,8 @@ NOTES
 
 - The application still needs network access to the API configured when
   this package was built. A company VPN may be required.
-- Replacing files inside dist while the server is running is not
-  recommended. Close the server window, replace the package, and restart.
+- Before replacing this package, restart Windows or end the AIRI node.exe
+  process in Task Manager, then replace the package and start it again.
 - If Windows Firewall asks about network access, you may cancel when the
   application is only used on this computer.
 
@@ -83,8 +83,8 @@ AIRI 展示端 - 快速安装
 3. Node.js 安装完成后，双击 start-display.cmd。如果启动程序提示找不到
    Node.js，请重启一次 Windows，然后再次双击启动。
 
-4. 请保持最小化的“AIRI Display Server”窗口运行。网站会自动打开：
-   http://localhost:3000
+4. AIRI Display 服务会在后台运行，网站会自动打开：http://localhost:3000。
+   如果关闭了浏览器，再次双击 start-display.cmd 即可重新打开。
 
 检查安装
 --------
@@ -120,6 +120,6 @@ AIRI 展示端 - 快速安装
 --------
 
 - 应用仍然需要访问构建安装包时配置的 API 服务，可能需要连接公司网络或 VPN。
-- 不建议在服务器运行时替换 dist 文件夹中的文件。请先关闭服务器窗口，
-  再替换安装包并重新启动。
+- 替换安装包前，请重启 Windows，或在任务管理器中结束 AIRI 的 node.exe
+  进程，然后替换安装包并重新启动。
 - 如果 Windows 防火墙询问是否允许网络访问，而应用只在本机使用，可以取消。
