@@ -1,6 +1,7 @@
 param(
     [string]$DistPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'dist'),
-    [string]$EnvironmentPath = (Join-Path (Split-Path $PSScriptRoot -Parent) '.env'),
+    [string]$EnvironmentPath,
+    [string]$EnvironmentRoot = (Split-Path $PSScriptRoot -Parent),
     [string]$OutputRoot = (Split-Path $PSScriptRoot -Parent),
     [string]$PackageName = ('AIRI-Display-Windows-{0}' -f (Get-Date -Format 'yyyy-MM-dd'))
 )
@@ -8,29 +9,58 @@ param(
 $ErrorActionPreference = 'Stop'
 $templateRoot = Join-Path $PSScriptRoot 'display-package'
 $resolvedDistPath = [System.IO.Path]::GetFullPath($DistPath)
-$resolvedEnvironmentPath = [System.IO.Path]::GetFullPath($EnvironmentPath)
+$resolvedEnvironmentRoot = [System.IO.Path]::GetFullPath($EnvironmentRoot)
 $resolvedOutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
 
 if (-not (Test-Path -LiteralPath (Join-Path $resolvedDistPath 'index.html') -PathType Leaf)) {
     throw "Built site not found at $resolvedDistPath. Run npm run build first."
-}
-if (-not (Test-Path -LiteralPath $resolvedEnvironmentPath -PathType Leaf)) {
-    throw "Environment file not found at $resolvedEnvironmentPath."
 }
 if ([string]::IsNullOrWhiteSpace($PackageName) -or
     [System.IO.Path]::GetFileName($PackageName) -ne $PackageName) {
     throw "PackageName must be a single directory name."
 }
 
+if (-not [string]::IsNullOrWhiteSpace($EnvironmentPath)) {
+    $environmentFiles = @([System.IO.Path]::GetFullPath($EnvironmentPath))
+}
+else {
+    $environmentFiles = @(
+        '.env',
+        '.env.local',
+        '.env.production',
+        '.env.production.local'
+    ) | ForEach-Object {
+        Join-Path $resolvedEnvironmentRoot $_
+    } | Where-Object {
+        Test-Path -LiteralPath $_ -PathType Leaf
+    }
+}
+if ($environmentFiles.Count -eq 0) {
+    throw "No Vite environment files were found in $resolvedEnvironmentRoot."
+}
+foreach ($environmentFile in $environmentFiles) {
+    if (-not (Test-Path -LiteralPath $environmentFile -PathType Leaf)) {
+        throw "Environment file not found at $environmentFile."
+    }
+}
+
 $environment = @{}
-Get-Content -LiteralPath $resolvedEnvironmentPath | ForEach-Object {
-    if ($_ -match '^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.*?)\s*$') {
-        $value = $matches[2].Trim()
-        if (($value.StartsWith('"') -and $value.EndsWith('"')) -or
-            ($value.StartsWith("'") -and $value.EndsWith("'"))) {
-            $value = $value.Substring(1, $value.Length - 2)
+foreach ($environmentFile in $environmentFiles) {
+    Get-Content -LiteralPath $environmentFile | ForEach-Object {
+        if ($_ -match '^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.*?)\s*$') {
+            $value = $matches[2].Trim()
+            if (($value.StartsWith('"') -and $value.EndsWith('"')) -or
+                ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+                $value = $value.Substring(1, $value.Length - 2)
+            }
+            $environment[$matches[1]] = $value
         }
-        $environment[$matches[1]] = $value
+    }
+}
+foreach ($variableName in @('VITE_AIRI_API_BASE_URL', 'VITE_AIRI_UPLOAD_PATH')) {
+    $processValue = [System.Environment]::GetEnvironmentVariable($variableName, 'Process')
+    if ($null -ne $processValue) {
+        $environment[$variableName] = $processValue
     }
 }
 

@@ -146,3 +146,74 @@ test(
         });
     },
 );
+
+test(
+    'uses Vite production environment precedence when no environment file is specified',
+    { skip: process.platform !== 'win32' },
+    async (t) => {
+        const temporaryRoot = await mkdtemp(join(tmpdir(), 'airi-display-env-'));
+        const distPath = join(temporaryRoot, 'dist');
+        const environmentRoot = join(temporaryRoot, 'environment');
+        const outputRoot = join(temporaryRoot, 'output');
+        await mkdir(distPath);
+        await mkdir(environmentRoot);
+        await writeFile(join(distPath, 'index.html'), '<div id="root"></div>');
+        await writeFile(
+            join(environmentRoot, '.env'),
+            'VITE_AIRI_API_BASE_URL=https://base.example.test\n',
+        );
+        await writeFile(
+            join(environmentRoot, '.env.local'),
+            'VITE_AIRI_API_BASE_URL=https://local.example.test\n',
+        );
+        await writeFile(
+            join(environmentRoot, '.env.production'),
+            'VITE_AIRI_API_BASE_URL=https://production.example.test\n',
+        );
+        await writeFile(
+            join(environmentRoot, '.env.production.local'),
+            [
+                'VITE_AIRI_API_BASE_URL=https://production-local.example.test',
+                'VITE_AIRI_UPLOAD_PATH=/custom/upload',
+            ].join('\n'),
+        );
+        t.after(() => rm(temporaryRoot, { recursive: true, force: true }));
+
+        const result = await run(
+            'powershell.exe',
+            [
+                '-NoProfile',
+                '-ExecutionPolicy',
+                'Bypass',
+                '-File',
+                join(process.cwd(), 'scripts', 'package-display.ps1'),
+                '-DistPath',
+                distPath,
+                '-EnvironmentRoot',
+                environmentRoot,
+                '-OutputRoot',
+                outputRoot,
+                '-PackageName',
+                'AIRI-Display-Env-Test',
+            ],
+            {
+                cwd: process.cwd(),
+                env: {
+                    ...process.env,
+                    VITE_AIRI_API_BASE_URL: undefined,
+                    VITE_AIRI_UPLOAD_PATH: undefined,
+                },
+            },
+        );
+
+        assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+        const configText = await readFile(
+            join(outputRoot, 'AIRI-Display-Env-Test', 'display-config.json'),
+            'utf8',
+        );
+        assert.deepEqual(JSON.parse(configText.replace(/^\uFEFF/, '')), {
+            apiBaseUrl: 'https://production-local.example.test',
+            uploadPath: '/custom/upload',
+        });
+    },
+);
