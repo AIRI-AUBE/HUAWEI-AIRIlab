@@ -10,7 +10,7 @@
         "preview": "vite preview",
         "test": "npm run test:types && npm run test:contracts",
         "test:types": "tsc -p tsconfig.app.json --noEmit --pretty false && tsc -p tsconfig.node.json --noEmit --pretty false",
-        "test:contracts": "node --test tests/generation-workflows.test.mjs",
+        "test:contracts": "node --test tests/generation-workflows.test.mjs tests/display-server.test.mjs tests/display-diagnostics.test.mjs",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
