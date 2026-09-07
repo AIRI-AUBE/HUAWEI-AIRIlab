@@ -63,6 +63,12 @@
         "promptHeading": "3. Enter Prompt Words",
         "promptPlaceholder": "Describe the image content you want to generate",
         "generate": "Generate Image",
+        "generateDisabled": {
+            "missingReference": "Add at least one reference image before generating.",
+            "uploading": "Wait for the image upload to finish.",
+            "templateLoading": "Wait for the selected template to finish loading.",
+            "generating": "Image generation is already in progress."
+        },
         "preview": "Preview",
         "previewDescription": "Generated images will appear here",
         "referenceImageLabel": "Reference image {{number}}",

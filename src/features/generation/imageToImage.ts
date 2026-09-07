@@ -11,12 +11,28 @@ export const imageToImagePromptMaxLength = 6000;
 export const hasRequiredImageToImageInputs = (input: {
     baseImage?: { url: string };
     referenceImages: Array<{ url: string }>;
-}) =>
-    Boolean(
-        input.baseImage?.url &&
-        input.referenceImages.length &&
-        input.referenceImages.every(({ url }) => url),
-    );
+}) => Boolean(input.referenceImages.length && input.referenceImages.every(({ url }) => url));
+
+export type ImageToImageDisabledReason =
+    'missingReference' | 'uploading' | 'templateLoading' | 'generating';
+
+export const getImageToImageDisabledReason = ({
+    hasRequiredInputs,
+    templateLoading,
+    uploadInProgress,
+    generating,
+}: {
+    hasRequiredInputs: boolean;
+    templateLoading: boolean;
+    uploadInProgress: boolean;
+    generating: boolean;
+}): ImageToImageDisabledReason | undefined => {
+    if (generating) return 'generating';
+    if (templateLoading) return 'templateLoading';
+    if (uploadInProgress) return 'uploading';
+    if (!hasRequiredInputs) return 'missingReference';
+    return undefined;
+};
 
 export const mapImageToImagePayload = (input: {
     baseImage?: UploadedImage;
@@ -37,9 +53,6 @@ export const mapImageToImagePayload = (input: {
     }
     if (!isReferenceImageCategory(imageType)) {
         throw new Error('Workflow 39 received an unsupported image category.');
-    }
-    if (!input.baseImage?.url) {
-        throw new Error('Workflow 39 requires a base image.');
     }
     if (!input.referenceImages.length) {
         throw new Error('Workflow 39 requires at least one reference image.');

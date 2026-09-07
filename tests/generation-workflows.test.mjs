@@ -127,7 +127,7 @@ test('image-to-image rejects payloads without a reference image', async () => {
     );
 });
 
-test('image-to-image readiness requires both base and reference images', async () => {
+test('image-to-image readiness requires references but allows no base image', async () => {
     const { hasRequiredImageToImageInputs } = await server.ssrLoadModule(
         '/src/features/generation/imageToImage.ts',
     );
@@ -143,7 +143,7 @@ test('image-to-image readiness requires both base and reference images', async (
         hasRequiredImageToImageInputs({
             referenceImages: [{ url: 'https://example.test/reference.webp' }],
         }),
-        false,
+        true,
     );
     assert.equal(
         hasRequiredImageToImageInputs({
@@ -202,26 +202,48 @@ test('image-to-image accepts 6,000 prompt characters and rejects 6,001', async (
     );
 });
 
-test('image-to-image rejects payloads without a base image', async () => {
+test('image-to-image emits an empty base image when the template has none', async () => {
     const { mapImageToImagePayload } = await server.ssrLoadModule(
         '/src/features/generation/imageToImage.ts',
     );
 
-    assert.throws(
-        () =>
-            mapImageToImagePayload({
-                imageType: 'architecture',
-                referenceImages: [
-                    {
-                        url: 'https://example.test/reference.webp',
-                        tags: ['architecture.design_approach'],
-                    },
-                ],
-                projectId: 101,
-                teamId: 202,
-            }),
-        /requires a base image/i,
+    const payload = mapImageToImagePayload({
+        imageType: 'architecture',
+        referenceImages: [
+            {
+                url: 'https://example.test/reference.webp',
+                tags: ['architecture.design_approach'],
+            },
+        ],
+        projectId: 101,
+        teamId: 202,
+    });
+
+    assert.equal(payload.baseImage, '');
+});
+
+test('image-to-image disabled reasons identify the active blocker', async () => {
+    const { getImageToImageDisabledReason } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
     );
+    const ready = {
+        hasRequiredInputs: true,
+        templateLoading: false,
+        uploadInProgress: false,
+        generating: false,
+    };
+
+    assert.equal(getImageToImageDisabledReason(ready), undefined);
+    assert.equal(
+        getImageToImageDisabledReason({ ...ready, hasRequiredInputs: false }),
+        'missingReference',
+    );
+    assert.equal(getImageToImageDisabledReason({ ...ready, uploadInProgress: true }), 'uploading');
+    assert.equal(
+        getImageToImageDisabledReason({ ...ready, templateLoading: true }),
+        'templateLoading',
+    );
+    assert.equal(getImageToImageDisabledReason({ ...ready, generating: true }), 'generating');
 });
 
 test('image-to-image rejects an unsupported image category', async () => {

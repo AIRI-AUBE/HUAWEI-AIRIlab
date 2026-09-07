@@ -6,7 +6,7 @@ import {
     isReferenceImageCategory,
 } from '../../data/referenceImageTags';
 import { getV3Case, loadTemplateCase, type V3Template } from '../../data/v3/cases';
-import { mapImageToImagePayload } from '../generation/imageToImage';
+import { hasRequiredImageToImageInputs, mapImageToImagePayload } from '../generation/imageToImage';
 import { generate, waitForResult } from '../generation/universalGeneration';
 import {
     disposeUploadedImage,
@@ -335,7 +335,7 @@ export function useCreativeRefinementActions() {
     };
 
     const startGeneration = async () => {
-        if (generationLock.current || !state.form.baseImage) return;
+        if (generationLock.current || !hasRequiredImageToImageInputs(state.form)) return;
         generationLock.current = true;
         const controller = new AbortController();
         generationAbort.current = controller;

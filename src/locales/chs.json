@@ -76,6 +76,12 @@
         "promptHeading": "3. 输入提示词",
         "promptPlaceholder": "描述你想要的图像生成内容",
         "generate": "生成图片",
+        "generateDisabled": {
+            "missingReference": "请至少添加一张参考图后再生成。",
+            "uploading": "请等待图片上传完成。",
+            "templateLoading": "请等待所选模板加载完成。",
+            "generating": "图片正在生成中。"
+        },
         "preview": "预览",
         "previewDescription": "生成的图片将在此处显示",
         "referenceImageLabel": "参考图片 {{number}}",

@@ -12,6 +12,7 @@ import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRe
 import { deriveTemplateAssetPresentation } from '../features/creativeRefinement/templatePresentation';
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
 import {
+    getImageToImageDisabledReason,
     hasRequiredImageToImageInputs,
     imageToImagePromptMaxLength,
 } from '../features/generation/imageToImage';
@@ -83,6 +84,20 @@ export function ImageToImagePage() {
         : referenceLoadingCount;
     const referenceLoading = referenceStatus === 'validating' || referenceStatus === 'uploading';
     const generating = ['validating', 'submitting', 'generating'].includes(generationStatus);
+    const generateDisabledReason = getImageToImageDisabledReason({
+        hasRequiredInputs: hasRequiredImageToImageInputs(form),
+        templateLoading,
+        uploadInProgress:
+            baseStatus === 'validating' ||
+            baseStatus === 'uploading' ||
+            referenceLoading ||
+            referenceLoadingCount > 0,
+        generating,
+    });
+    const generateDisabledMessage = generateDisabledReason
+        ? t(`imageToImage.generateDisabled.${generateDisabledReason}`)
+        : undefined;
+    const generateTooltipId = 'image-to-image-generate-tooltip';
     return (
         <main className="image-workspace">
             <aside className="refinement-panel">
@@ -198,21 +213,30 @@ export function ImageToImagePage() {
                         />
                     </RefinementSection>
                 </div>
-                <button
-                    className="refinement-generate"
-                    type="button"
-                    disabled={
-                        !hasRequiredImageToImageInputs(form) ||
-                        baseStatus !== 'success' ||
-                        templateLoading ||
-                        referenceLoading ||
-                        referenceLoadingCount > 0 ||
-                        generating
-                    }
-                    onClick={actions.startGeneration}
+                <div
+                    className="refinement-generate-shell"
+                    tabIndex={generateDisabledReason ? 0 : undefined}
+                    aria-describedby={generateDisabledReason ? generateTooltipId : undefined}
                 >
-                    {generating ? t('imageToImage.generating') : t('imageToImage.generate')}
-                </button>
+                    <button
+                        className="refinement-generate"
+                        type="button"
+                        disabled={Boolean(generateDisabledReason)}
+                        aria-describedby={generateDisabledReason ? generateTooltipId : undefined}
+                        onClick={actions.startGeneration}
+                    >
+                        {generating ? t('imageToImage.generating') : t('imageToImage.generate')}
+                    </button>
+                    {generateDisabledMessage && (
+                        <span
+                            className="refinement-generate-tooltip"
+                            id={generateTooltipId}
+                            role="tooltip"
+                        >
+                            {generateDisabledMessage}
+                        </span>
+                    )}
+                </div>
                 {generationError && (
                     <p className="generation-error" role="alert">
                         {generationError}
