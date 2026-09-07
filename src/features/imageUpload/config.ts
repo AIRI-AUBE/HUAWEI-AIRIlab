@@ -15,7 +15,7 @@ const shared = {
     minSide: 240,
 } as const;
 
-export const workflow44Config = {
+export const imageToImageConfig = {
     workflowId: 39,
     workflowVersion: 'V3',
     maxReferenceImages: 3,

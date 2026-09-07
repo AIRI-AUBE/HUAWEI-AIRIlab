@@ -1,10 +1,10 @@
-export type Workflow44Reference = {
+export type ImageToImageReference = {
     url: string;
     weight: 0;
     categories: string[];
 };
 
-export type Workflow44Payload = {
+export type ImageToImagePayload = {
     toolsetEntry: 1;
     toolsetLv2: 'explore';
     model: 39;
@@ -13,7 +13,7 @@ export type Workflow44Payload = {
     __generationSettings: { exploreV3: Record<string, never> };
     megapixels: 1;
     baseImage: string;
-    referenceImage: Workflow44Reference[];
+    referenceImage: ImageToImageReference[];
     imageType: string;
     workflowId: 39;
     workflowVersion: 'V3';
@@ -71,7 +71,7 @@ export type TextToImagePayload = {
     language: 'chs';
 };
 
-export type GenerationPayload = Workflow44Payload | TextToImagePayload;
+export type GenerationPayload = ImageToImagePayload | TextToImagePayload;
 
 export type JobState = { status: string; message?: string };
 export type GenerationOutput = {

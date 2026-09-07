@@ -1,18 +1,31 @@
 # Universal Generation API integration
 
 The V3 client uses the API origin in `VITE_AIRI_API_BASE_URL`. Upload routing can be overridden with
-`VITE_AIRI_UPLOAD_PATH`; otherwise it uses `/api/Workflow/UploadMedia`. `VITE_AIRI_PROJECT_ID`
+`VITE_AIRI_UPLOAD_PATH`; otherwise it uses `/api/GenerateWorkflow/UploadMedia`. `VITE_AIRI_PROJECT_ID`
 and `VITE_AIRI_TEAM_ID` must identify the current owner/environment and must never be copied from API examples.
 
 ## Authentication and security
 
-Requests use same-origin credentials. `VITE_AIRI_API_KEY` is supported for controlled deployments that explicitly
-accept a browser-visible key, but production deployments should put `X-AIRI-API-Key` on a server-side proxy instead.
-Never commit, log, place in a URL, or display a raw key.
+Generation and upload requests omit browser credentials. When `VITE_AIRI_AUTH_TOKEN` is set, the client sends it as a
+Bearer token. `VITE_AIRI_API_KEY` is supported for controlled deployments that explicitly accept a browser-visible key,
+but production deployments should put `X-AIRI-API-Key` on a server-side proxy instead. Never commit, log, place in a URL,
+or display a raw key.
 
-## Workflow 44 V3
+## Workflow routing
 
-Generation submits `POST /api/Universal/Generate` with JSON shaped as follows:
+Both user flows submit to `POST /api/Universal/Generate`, but they have deliberately separate payload mappers:
+
+| User flow      | Workflow ID | Payload mapper                            |
+| -------------- | ----------- | ----------------------------------------- |
+| Text to image  | `"44"`      | `src/features/generation/textToImage.ts`  |
+| Image to image | `39`        | `src/features/generation/imageToImage.ts` |
+
+The workflow ID types match the currently accepted API contracts: text-to-image uses the string `"44"`, while
+image-to-image uses the number `39`.
+
+## Text-to-image: workflow 44 V3
+
+Text-to-image submits the following payload:
 
 ```json
 {
@@ -24,13 +37,45 @@ Generation submits `POST /api/Universal/Generate` with JSON shaped as follows:
     "aspectRatio": "16:9",
     "orientation": 0,
     "imageRatio": 3,
-    "referenceImage": [{ "url": "https://<persisted-reference-url>" }],
+    "referenceImage": [],
     "language": "chs"
 }
 ```
 
-`projectId` and `teamId` are submitted as numbers sourced from the environment. `referenceImage` supports zero through
-three entries, and each entry contains only an HTTPS `url`. Local object URLs are preview-only and are never submitted.
+`projectId` and `teamId` are submitted as numbers sourced from the environment. Text-to-image never submits a base image
+or reference images.
+
+## Image-to-image: workflow 39 V3
+
+Image-to-image first uploads the selected images, then submits the persisted URLs in the workflow-39 payload. The
+distinguishing fields are:
+
+```json
+{
+    "workflowId": 39,
+    "workflowVersion": "V3",
+    "model": 39,
+    "projectId": "<current-project-id>",
+    "projectName": "<current-project-name>",
+    "teamId": "<current-team-id>",
+    "baseImage": "https://<persisted-base-image-url>",
+    "imageType": "architecture",
+    "referenceImage": [
+        {
+            "url": "https://<persisted-reference-image-url>",
+            "weight": 0,
+            "categories": ["facade_or_interface"]
+        }
+    ],
+    "enteredText": "<prompt>",
+    "prompt": "<prompt>",
+    "language": "en"
+}
+```
+
+The mapper also supplies workflow-39's fixed generation settings, including dimensions, quality, style defaults, and
+control values. Image-to-image supports at most three reference images. Local object URLs are preview-only and are never
+submitted. The prompt input is optional; when omitted, both `enteredText` and `prompt` are submitted as empty strings.
 
 ## Polling and results
 

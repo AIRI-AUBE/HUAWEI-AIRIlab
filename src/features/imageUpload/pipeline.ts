@@ -1,4 +1,4 @@
-import { workflow44Config } from './config';
+import { imageToImageConfig } from './config';
 import { ImageUploadError } from './errors';
 import type { ImageRole, UploadedImage, UploadProgress } from './types';
 import { uploadImage } from './uploadService';
@@ -13,7 +13,7 @@ export const runImageUploadPipeline = async (
     signal?: AbortSignal,
 ): Promise<UploadedImage> => {
     onProgress?.('validating');
-    const rules = workflow44Config.rules[role];
+    const rules = imageToImageConfig.rules[role];
     const dimensions = await validateImage(file, rules);
     const normalized = await normalizeImage(file, dimensions, rules.maxPixels);
     onProgress?.('uploading');

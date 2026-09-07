@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getV3Case, loadTemplateCase, type V3Template } from '../../data/v3/cases';
+import { mapImageToImagePayload } from '../generation/imageToImage';
 import { generate, waitForResult } from '../generation/universalGeneration';
-import { mapWorkflow44Payload } from '../generation/workflow44';
 import {
     disposeUploadedImage,
     errorMessage,
@@ -191,7 +191,7 @@ export function useCreativeRefinementActions() {
         state.setOutputs([]);
         state.setJobId('');
         try {
-            const payload = mapWorkflow44Payload({
+            const payload = mapImageToImagePayload({
                 baseImage: state.form.baseImage,
                 imageType: state.form.baseImageType,
                 referenceImages: state.form.referenceImages,
