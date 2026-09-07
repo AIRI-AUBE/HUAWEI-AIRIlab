@@ -656,6 +656,54 @@ test('template uploads are staged as one complete result', async () => {
     });
 });
 
+test('template loading hides retained thumbnails until the replacement is ready', async () => {
+    const { deriveTemplateAssetPresentation } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/templatePresentation.ts',
+    );
+    const form = {
+        baseImage: { previewUrl: '/old-base.webp' },
+        referenceImages: [
+            {
+                previewUrl: '/old-reference.webp',
+                tags: ['architecture.facade_design'],
+            },
+        ],
+    };
+
+    assert.deepEqual(
+        deriveTemplateAssetPresentation({
+            form,
+            activeReference: 0,
+            templateLoading: true,
+            targetHasBaseImage: true,
+            targetReferenceCount: 2,
+        }),
+        {
+            baseImages: [],
+            referenceImages: [],
+            activeTags: [],
+            baseLoadingCount: 1,
+            referenceLoadingCount: 2,
+        },
+    );
+    assert.deepEqual(
+        deriveTemplateAssetPresentation({
+            form,
+            activeReference: 0,
+            templateLoading: false,
+            targetHasBaseImage: false,
+            targetReferenceCount: 0,
+        }),
+        {
+            baseImages: ['/old-base.webp'],
+            referenceImages: ['/old-reference.webp'],
+            activeTags: ['architecture.facade_design'],
+            baseLoadingCount: 0,
+            referenceLoadingCount: 0,
+        },
+    );
+});
+
 test('a queued template state update remains valid after its request completes', async () => {
     const { createLatestRequestGate } = await server.ssrLoadModule(
         '/src/features/creativeRefinement/latestRequest.ts',

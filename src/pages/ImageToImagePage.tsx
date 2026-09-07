@@ -7,8 +7,9 @@ import { ReferenceImageTagSelector } from '../components/ReferenceImageTagSelect
 import { V3TemplateSelector } from '../components/V3TemplateSelector';
 import options from '../data/imageToImageOptions.json';
 import { getReferenceImageTags } from '../data/referenceImageTags';
-import { v3Templates } from '../data/v3/cases';
+import { getV3Case, v3Templates } from '../data/v3/cases';
 import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
+import { deriveTemplateAssetPresentation } from '../features/creativeRefinement/templatePresentation';
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
 import {
     hasRequiredImageToImageInputs,
@@ -55,15 +56,31 @@ export function ImageToImagePage() {
         return () => window.clearTimeout(timer);
     }, [form.categoryNotice, setForm]);
 
-    const activeTags = form.referenceImages[activeReference]?.tags ?? [];
     const referenceTagOptions = getReferenceImageTags(form.baseImageType);
     const categoryNoticeLabel = form.categoryNotice
         ? options.baseTypes.find(({ id }) => id === form.categoryNotice)?.[language]
         : undefined;
     const templateLoading = templateStatus === 'loading';
-    const baseLoading =
-        !form.baseImage &&
-        (templateLoading || baseStatus === 'validating' || baseStatus === 'uploading');
+    const loadingCase = loadingTemplateId ? getV3Case(loadingTemplateId) : undefined;
+    const assetPresentation = deriveTemplateAssetPresentation({
+        form,
+        activeReference,
+        templateLoading,
+        targetHasBaseImage: Boolean(loadingCase?.baseImage),
+        targetReferenceCount: [
+            loadingCase?.ref1Image,
+            loadingCase?.ref2Image,
+            loadingCase?.ref3Image,
+        ].filter(Boolean).length,
+    });
+    const baseLoadingCount = templateLoading
+        ? assetPresentation.baseLoadingCount
+        : !form.baseImage && (baseStatus === 'validating' || baseStatus === 'uploading')
+          ? 1
+          : 0;
+    const visibleReferenceLoadingCount = templateLoading
+        ? assetPresentation.referenceLoadingCount
+        : referenceLoadingCount;
     const referenceLoading = referenceStatus === 'validating' || referenceStatus === 'uploading';
     const generating = ['validating', 'submitting', 'generating'].includes(generationStatus);
     return (
@@ -92,7 +109,7 @@ export function ImageToImagePage() {
                             label={t('imageToImage.baseUpload')}
                             eyebrow={options.baseUploadEyebrow[language]}
                             icon="/assets/figma/upload.svg"
-                            images={form.baseImage ? [form.baseImage.previewUrl] : []}
+                            images={assetPresentation.baseImages}
                             onImages={actions.addBase}
                             onRemove={actions.removeBase}
                             statusText={
@@ -103,7 +120,7 @@ export function ImageToImagePage() {
                                       : undefined
                             }
                             error={baseError}
-                            loadingCount={baseLoading ? 1 : 0}
+                            loadingCount={baseLoadingCount}
                             loadingText={
                                 templateLoading
                                     ? t('imageToImage.loadingTemplate')
@@ -133,13 +150,13 @@ export function ImageToImagePage() {
                             icon="/assets/figma/upload-reference.svg"
                             multiple
                             maxImages={3}
-                            images={form.referenceImages.map((image) => image.previewUrl)}
+                            images={assetPresentation.referenceImages}
                             activeIndex={activeReference}
                             onImages={actions.addReferences}
                             onSelect={setActiveReference}
                             onRemove={actions.removeReference}
                             error={referenceError}
-                            loadingCount={referenceLoadingCount}
+                            loadingCount={visibleReferenceLoadingCount}
                             loadingText={
                                 templateLoading
                                     ? t('imageToImage.loadingTemplate')
@@ -165,7 +182,7 @@ export function ImageToImagePage() {
                             className="reference-tags"
                             language={language}
                             options={referenceTagOptions}
-                            selectedIds={activeTags}
+                            selectedIds={assetPresentation.activeTags}
                             onChange={actions.updateReferenceTags}
                         />
                     </RefinementSection>
