@@ -77,6 +77,8 @@
         "promptPlaceholder": "描述你想要的图像生成内容",
         "generate": "生成图片",
         "generateDisabled": {
+            "missingBaseAndReference": "请添加一张底图和至少一张参考图后再生成。",
+            "missingBase": "请添加一张底图后再生成。",
             "missingReference": "请至少添加一张参考图后再生成。",
             "uploading": "请等待图片上传完成。",
             "templateLoading": "请等待所选模板加载完成。",

@@ -127,7 +127,7 @@ test('image-to-image rejects payloads without a reference image', async () => {
     );
 });
 
-test('image-to-image readiness requires references but allows no base image', async () => {
+test('image-to-image readiness requires both base and reference images', async () => {
     const { hasRequiredImageToImageInputs } = await server.ssrLoadModule(
         '/src/features/generation/imageToImage.ts',
     );
@@ -143,7 +143,7 @@ test('image-to-image readiness requires references but allows no base image', as
         hasRequiredImageToImageInputs({
             referenceImages: [{ url: 'https://example.test/reference.webp' }],
         }),
-        true,
+        false,
     );
     assert.equal(
         hasRequiredImageToImageInputs({
@@ -202,24 +202,26 @@ test('image-to-image accepts 6,000 prompt characters and rejects 6,001', async (
     );
 });
 
-test('image-to-image emits an empty base image when the template has none', async () => {
+test('image-to-image rejects payloads without a base image', async () => {
     const { mapImageToImagePayload } = await server.ssrLoadModule(
         '/src/features/generation/imageToImage.ts',
     );
 
-    const payload = mapImageToImagePayload({
-        imageType: 'architecture',
-        referenceImages: [
-            {
-                url: 'https://example.test/reference.webp',
-                tags: ['architecture.design_approach'],
-            },
-        ],
-        projectId: 101,
-        teamId: 202,
-    });
-
-    assert.equal(payload.baseImage, '');
+    assert.throws(
+        () =>
+            mapImageToImagePayload({
+                imageType: 'architecture',
+                referenceImages: [
+                    {
+                        url: 'https://example.test/reference.webp',
+                        tags: ['architecture.design_approach'],
+                    },
+                ],
+                projectId: 101,
+                teamId: 202,
+            }),
+        /requires a base image/i,
+    );
 });
 
 test('image-to-image disabled reasons identify the active blocker', async () => {
@@ -227,7 +229,8 @@ test('image-to-image disabled reasons identify the active blocker', async () => 
         '/src/features/generation/imageToImage.ts',
     );
     const ready = {
-        hasRequiredInputs: true,
+        hasBaseImage: true,
+        hasReferenceImages: true,
         templateLoading: false,
         uploadInProgress: false,
         generating: false,
@@ -235,7 +238,16 @@ test('image-to-image disabled reasons identify the active blocker', async () => 
 
     assert.equal(getImageToImageDisabledReason(ready), undefined);
     assert.equal(
-        getImageToImageDisabledReason({ ...ready, hasRequiredInputs: false }),
+        getImageToImageDisabledReason({
+            ...ready,
+            hasBaseImage: false,
+            hasReferenceImages: false,
+        }),
+        'missingBaseAndReference',
+    );
+    assert.equal(getImageToImageDisabledReason({ ...ready, hasBaseImage: false }), 'missingBase');
+    assert.equal(
+        getImageToImageDisabledReason({ ...ready, hasReferenceImages: false }),
         'missingReference',
     );
     assert.equal(getImageToImageDisabledReason({ ...ready, uploadInProgress: true }), 'uploading');
@@ -810,5 +822,19 @@ test('template selection numbers resolve through the template category', async (
             ['interior.furnishings_decor', 'interior.lighting_atmosphere'],
             ['interior.lighting_atmosphere', 'interior.visual_style'],
         ],
+    );
+});
+
+test('the base-less workbook case reuses Template 02 base image', async () => {
+    const { caseToFormAssets, getV3Case } = await server.ssrLoadModule('/src/data/v3/cases.ts');
+    const templateTwo = getV3Case('case-002');
+    const templateThree = getV3Case('case-003');
+    assert.ok(templateTwo);
+    assert.ok(templateThree);
+
+    assert.equal(templateThree.baseImage, templateTwo.baseImage);
+    assert.equal(
+        caseToFormAssets(templateThree).baseImage?.previewUrl,
+        '/v3/cases/case-002/base.webp',
     );
 });

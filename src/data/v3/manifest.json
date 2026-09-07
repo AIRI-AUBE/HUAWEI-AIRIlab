@@ -53,7 +53,7 @@
       "id": "case-003",
       "excelRow": 4,
       "type": "建筑",
-      "baseImage": null,
+      "baseImage": "/v3/cases/case-002/base.webp",
       "ref1Image": "/v3/cases/case-003/ref-1.webp",
       "ref1Selections": [
         1,

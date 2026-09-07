@@ -13,7 +13,6 @@ import { deriveTemplateAssetPresentation } from '../features/creativeRefinement/
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
 import {
     getImageToImageDisabledReason,
-    hasRequiredImageToImageInputs,
     imageToImagePromptMaxLength,
 } from '../features/generation/imageToImage';
 
@@ -84,8 +83,12 @@ export function ImageToImagePage() {
         : referenceLoadingCount;
     const referenceLoading = referenceStatus === 'validating' || referenceStatus === 'uploading';
     const generating = ['validating', 'submitting', 'generating'].includes(generationStatus);
+    const hasReferenceImages = Boolean(
+        form.referenceImages.length && form.referenceImages.every(({ url }) => url),
+    );
     const generateDisabledReason = getImageToImageDisabledReason({
-        hasRequiredInputs: hasRequiredImageToImageInputs(form),
+        hasBaseImage: Boolean(form.baseImage?.url),
+        hasReferenceImages,
         templateLoading,
         uploadInProgress:
             baseStatus === 'validating' ||

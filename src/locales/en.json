@@ -64,6 +64,8 @@
         "promptPlaceholder": "Describe the image content you want to generate",
         "generate": "Generate Image",
         "generateDisabled": {
+            "missingBaseAndReference": "Add a base image and at least one reference image before generating.",
+            "missingBase": "Add a base image before generating.",
             "missingReference": "Add at least one reference image before generating.",
             "uploading": "Wait for the image upload to finish.",
             "templateLoading": "Wait for the selected template to finish loading.",
