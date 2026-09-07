@@ -224,3 +224,58 @@ git diff --check
 git add src tests docs
 git commit -m "fix: harden image workflow async state"
 ```
+
+### Task 5: Deferred React commits and route cleanup
+
+**Files:**
+
+- Modify: `src/features/creativeRefinement/uploadTransactions.ts`
+- Modify: `src/features/creativeRefinement/useCreativeRefinementActions.ts`
+- Test: `tests/generation-workflows.test.mjs`
+
+**Interfaces:**
+
+- Consumes: the current request gate and provider-owned form/upload state
+- Produces: a queued form update whose validity is decided before enqueueing, plus settled provider statuses after route cleanup
+
+- [x] **Step 1: Write failing tests for deferred updater validity and retained-asset statuses**
+
+```js
+assert.equal(enqueueLatestRequestStateUpdate?.(input), true);
+gate.complete(request);
+assert.deepEqual(queuedUpdate(current), expected);
+assert.deepEqual(deriveSettledUploadStatuses(formWithImages), {
+    base: 'success',
+    reference: 'success',
+});
+```
+
+- [x] **Step 2: Run contract tests and verify both helpers are absent**
+
+```powershell
+npm run test:contracts
+```
+
+- [x] **Step 3: Decide request validity before enqueueing the React updater**
+
+```ts
+if (!gate.isCurrent(request)) return false;
+enqueue(update);
+return true;
+```
+
+- [x] **Step 4: Reset only active provider-owned operations during route cleanup**
+
+```ts
+const settledStatuses = deriveSettledUploadStatuses(formRef.current);
+if (baseUploadRequestGate.current.invalidate()) {
+    state.setBaseStatus(settledStatuses.base);
+}
+```
+
+- [x] **Step 5: Run contract and type tests**
+
+```powershell
+npm run test:contracts
+npm run test:types
+```

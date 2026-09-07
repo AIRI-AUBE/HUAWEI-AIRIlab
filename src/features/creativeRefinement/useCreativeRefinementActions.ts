@@ -16,7 +16,12 @@ import {
 } from '../imageUpload/pipeline';
 import { useCreativeRefinement } from './CreativeRefinementContext';
 import { createLatestRequestGate } from './latestRequest';
-import { appendUploadedImagesWithinLimit, stageTemplateUploads } from './uploadTransactions';
+import {
+    appendUploadedImagesWithinLimit,
+    deriveSettledUploadStatuses,
+    enqueueLatestRequestStateUpdate,
+    stageTemplateUploads,
+} from './uploadTransactions';
 
 export function useCreativeRefinementActions() {
     const { t } = useTranslation();
@@ -26,6 +31,8 @@ export function useCreativeRefinementActions() {
     const templateRequestGate = useRef(createLatestRequestGate());
     const baseUploadRequestGate = useRef(createLatestRequestGate());
     const referenceUploadRequestGate = useRef(createLatestRequestGate());
+    const formRef = useRef(state.form);
+    formRef.current = state.form;
 
     const invalidatePendingTemplateLoad = () => {
         if (!templateRequestGate.current.invalidate()) return;
@@ -47,10 +54,30 @@ export function useCreativeRefinementActions() {
 
     useEffect(
         () => () => {
-            templateRequestGate.current.invalidate();
-            baseUploadRequestGate.current.invalidate();
-            referenceUploadRequestGate.current.invalidate();
-            generationAbort.current?.abort();
+            const settledStatuses = deriveSettledUploadStatuses(formRef.current);
+            if (templateRequestGate.current.invalidate()) {
+                state.setLoadingTemplateId(undefined);
+                state.setTemplateStatus('idle');
+                state.setTemplateError('');
+                state.setReferenceLoadingCount(0);
+            }
+            if (baseUploadRequestGate.current.invalidate()) {
+                state.setBaseStatus(settledStatuses.base);
+                state.setBaseError('');
+            }
+            if (referenceUploadRequestGate.current.invalidate()) {
+                state.setReferenceStatus(settledStatuses.reference);
+                state.setReferenceError('');
+                state.setReferenceLoadingCount(0);
+            }
+            if (generationAbort.current) {
+                generationAbort.current.abort();
+                generationAbort.current = undefined;
+                generationLock.current = false;
+                state.setGenerationStatus('idle');
+                state.setGenerationError('');
+                state.setJobId('');
+            }
         },
         [],
     );
@@ -238,23 +265,28 @@ export function useCreativeRefinementActions() {
             });
             if (!isCurrentRequest()) return;
 
-            state.setForm((current) => {
-                if (!isCurrentRequest()) {
-                    disposeUploadedImage(staged.baseImage);
-                    staged.referenceImages.forEach(disposeUploadedImage);
-                    return current;
-                }
-                disposeUploadedImage(current.baseImage);
-                current.referenceImages.forEach(disposeUploadedImage);
-                return {
-                    ...current,
-                    baseImageType: loaded.baseImageType,
-                    baseImage: staged.baseImage,
-                    referenceImages: staged.referenceImages,
-                    prompt: loaded.prompt || current.prompt,
-                    categoryNotice: undefined,
-                };
+            const queued = enqueueLatestRequestStateUpdate({
+                gate: templateRequestGate.current,
+                request: requestId,
+                enqueue: state.setForm,
+                update: (current) => {
+                    disposeUploadedImage(current.baseImage);
+                    current.referenceImages.forEach(disposeUploadedImage);
+                    return {
+                        ...current,
+                        baseImageType: loaded.baseImageType,
+                        baseImage: staged.baseImage,
+                        referenceImages: staged.referenceImages,
+                        prompt: loaded.prompt || current.prompt,
+                        categoryNotice: undefined,
+                    };
+                },
             });
+            if (!queued) {
+                disposeUploadedImage(staged.baseImage);
+                staged.referenceImages.forEach(disposeUploadedImage);
+                return;
+            }
             state.setSelectedTemplateId(template.id);
             state.setTemplateStatus('success');
             state.setBaseStatus(staged.baseImage ? 'success' : 'idle');

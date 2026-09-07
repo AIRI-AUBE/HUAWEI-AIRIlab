@@ -656,6 +656,49 @@ test('template uploads are staged as one complete result', async () => {
     });
 });
 
+test('a queued template state update remains valid after its request completes', async () => {
+    const { createLatestRequestGate } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/latestRequest.ts',
+    );
+    const { enqueueLatestRequestStateUpdate } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/uploadTransactions.ts',
+    );
+    const gate = createLatestRequestGate();
+    const request = gate.begin();
+    const queuedUpdates = [];
+
+    const queued = enqueueLatestRequestStateUpdate?.({
+        gate,
+        request,
+        enqueue: (update) => queuedUpdates.push(update),
+        update: (current) => ({ ...current, template: 'new' }),
+    });
+    gate.complete(request);
+
+    assert.equal(queued, true);
+    assert.deepEqual(queuedUpdates[0]?.({ template: 'old' }), { template: 'new' });
+});
+
+test('upload status recovery reflects assets retained across route navigation', async () => {
+    const { deriveSettledUploadStatuses } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/uploadTransactions.ts',
+    );
+
+    assert.deepEqual(
+        deriveSettledUploadStatuses?.({
+            baseImage: { url: 'https://example.test/base.webp' },
+            referenceImages: [{ url: 'https://example.test/reference.webp' }],
+        }),
+        { base: 'success', reference: 'success' },
+    );
+    assert.deepEqual(
+        deriveSettledUploadStatuses?.({
+            referenceImages: [],
+        }),
+        { base: 'idle', reference: 'idle' },
+    );
+});
+
 test('template selection numbers resolve through the template category', async () => {
     const { caseToFormAssets, getV3Case } = await server.ssrLoadModule('/src/data/v3/cases.ts');
     const template = getV3Case('case-006');
