@@ -1,7 +1,15 @@
-import { toReferenceImagePayloadCategories } from '../../data/referenceImageTags';
+import {
+    isReferenceImageCategory,
+    toReferenceImagePayloadCategories,
+} from '../../data/referenceImageTags';
 import { imageToImageConfig } from '../imageUpload/config';
 import type { UploadedImage } from '../imageUpload/types';
 import type { ImageToImagePayload } from './types';
+
+export const hasRequiredImageToImageInputs = (input: {
+    baseImage?: { url: string };
+    referenceImages: Array<{ url: string }>;
+}) => Boolean(input.baseImage?.url && input.referenceImages.length);
 
 export const mapImageToImagePayload = (input: {
     baseImage?: UploadedImage;
@@ -19,6 +27,15 @@ export const mapImageToImagePayload = (input: {
     const imageType = input.imageType ?? 'architecture';
     if (!Number.isInteger(projectId) || projectId < 1 || !Number.isInteger(teamId) || teamId < 0) {
         throw new Error('Valid numeric project and team configuration is required.');
+    }
+    if (!isReferenceImageCategory(imageType)) {
+        throw new Error('Workflow 39 received an unsupported image category.');
+    }
+    if (!input.baseImage?.url) {
+        throw new Error('Workflow 39 requires a base image.');
+    }
+    if (!input.referenceImages.length) {
+        throw new Error('Workflow 39 requires at least one reference image.');
     }
     if (input.referenceImages.length > imageToImageConfig.maxReferenceImages) {
         throw new Error('Workflow 39 accepts at most three reference images.');
@@ -41,7 +58,7 @@ export const mapImageToImagePayload = (input: {
         workflowId: imageToImageConfig.workflowId,
         workflowVersion: imageToImageConfig.workflowVersion,
         enteredText: prompt,
-        additionalPrompt: '',
+        additionalPrompt: prompt,
         designLibraryName: 'No Style',
         designLibraryId: 99,
         firstTierName: 'No Style',

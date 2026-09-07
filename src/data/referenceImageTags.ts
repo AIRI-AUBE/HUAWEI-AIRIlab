@@ -164,6 +164,9 @@ export const referenceImageTagsByCategory: Readonly<
     ],
 };
 
+export const isReferenceImageCategory = (value: unknown): value is ReferenceImageCategory =>
+    typeof value === 'string' && Object.hasOwn(referenceImageTagsByCategory, value);
+
 export const getReferenceImageTags = (category: ReferenceImageCategory) =>
     referenceImageTagsByCategory[category];
 
@@ -182,13 +185,13 @@ export const toReferenceImagePayloadCategories = (
     category: unknown,
     selectedTagIds: string[],
 ): string[] => {
-    if (typeof category !== 'string' || !Object.hasOwn(referenceImageTagsByCategory, category)) {
+    if (!isReferenceImageCategory(category)) {
         return [];
     }
 
     const selectedIds = new Set(selectedTagIds);
     const selectedPayloadValues = new Set(
-        getReferenceImageTags(category as ReferenceImageCategory)
+        getReferenceImageTags(category)
             .filter(({ id }) => selectedIds.has(id))
             .map(({ payloadValue }) => payloadValue),
     );
@@ -218,6 +221,22 @@ export const appendReferenceImage = <T extends { tags: string[] }>(
     },
 ];
 
+export const toggleReferenceImageTag = (
+    selectedIds: string[],
+    tagId: string,
+    availableTagIds: string[],
+): string[] => {
+    const availableIds = new Set(availableTagIds);
+    const normalizedSelected = availableTagIds.filter((id) => selectedIds.includes(id));
+    if (!availableIds.has(tagId)) return normalizedSelected;
+    if (!normalizedSelected.includes(tagId)) {
+        return availableTagIds.filter((id) => id === tagId || normalizedSelected.includes(id));
+    }
+    return normalizedSelected.length === 1
+        ? normalizedSelected
+        : normalizedSelected.filter((id) => id !== tagId);
+};
+
 export const resetReferenceImageTags = <T extends { tags: string[] }>(
     references: T[],
     category: ReferenceImageCategory,
@@ -230,20 +249,31 @@ export const resetReferenceImageTags = <T extends { tags: string[] }>(
 export const changeReferenceImageCategory = <
     T extends {
         baseImageType: ReferenceImageCategory;
-        referenceImages: Array<{ tags: string[] }>;
+        baseImage?: { sourceType?: string };
+        referenceImages: Array<{ tags: string[]; sourceType?: string }>;
+        categoryNotice?: ReferenceImageCategory;
     },
 >(
     form: T,
     category: ReferenceImageCategory,
+    options: { removeTemplateAssets?: boolean } = {},
 ): { form: T; changed: boolean } => {
     if (form.baseImageType === category) return { form, changed: false };
 
+    const referenceImages = options.removeTemplateAssets
+        ? form.referenceImages.filter(({ sourceType }) => sourceType !== 'template')
+        : form.referenceImages;
     return {
         form: {
             ...form,
             baseImageType: category,
-            referenceImages: resetReferenceImageTags(form.referenceImages, category),
-        },
+            baseImage:
+                options.removeTemplateAssets && form.baseImage?.sourceType === 'template'
+                    ? undefined
+                    : form.baseImage,
+            referenceImages: resetReferenceImageTags(referenceImages, category),
+            categoryNotice: referenceImages.length ? category : undefined,
+        } as T,
         changed: true,
     };
 };

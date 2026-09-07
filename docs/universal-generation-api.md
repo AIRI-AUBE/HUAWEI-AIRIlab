@@ -68,14 +68,16 @@ distinguishing fields are:
         }
     ],
     "enteredText": "<prompt>",
+    "additionalPrompt": "<prompt>",
     "prompt": "<prompt>",
     "language": "en"
 }
 ```
 
 The mapper also supplies workflow-39's fixed generation settings, including dimensions, quality, style defaults, and
-control values. Image-to-image supports at most three reference images. Local object URLs are preview-only and are never
-submitted. The prompt input is optional; when omitted, both `enteredText` and `prompt` are submitted as empty strings.
+control values. A base image and at least one reference image are required; image-to-image supports one through three
+reference images. Local object URLs are preview-only and are never submitted. The prompt input is optional; its value is
+mirrored into `enteredText`, `additionalPrompt`, and `prompt`, with all three submitted as empty strings when omitted.
 
 ## Polling and results
 

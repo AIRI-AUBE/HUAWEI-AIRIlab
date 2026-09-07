@@ -42,6 +42,7 @@ export function OptionGrid({
                     type="button"
                     disabled={disabled}
                     className={selected.includes(option.id) ? 'selected' : ''}
+                    aria-pressed={selected.includes(option.id)}
                     onClick={() => onToggle(option.id)}
                 >
                     <span>{option[language]}</span>

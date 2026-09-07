@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
 
 let server;
@@ -80,6 +82,120 @@ test('image-to-image emits workflow 39 with uploaded images and no prompt', asyn
     assert.equal(payload.enteredText, '');
     assert.equal(payload.prompt, '');
     assert.equal('aspectRatio' in payload, false);
+});
+
+test('image-to-image mirrors a non-empty prompt into every official prompt field', async () => {
+    const { mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+
+    const payload = mapImageToImagePayload({
+        baseImage: { url: 'https://example.test/base.webp' },
+        imageType: 'architecture',
+        referenceImages: [
+            {
+                url: 'https://example.test/reference.webp',
+                tags: ['architecture.design_approach'],
+            },
+        ],
+        prompt: 'Refine the entrance canopy',
+        projectId: 101,
+        teamId: 202,
+    });
+
+    assert.equal(payload.enteredText, 'Refine the entrance canopy');
+    assert.equal(payload.prompt, 'Refine the entrance canopy');
+    assert.equal(payload.additionalPrompt, 'Refine the entrance canopy');
+});
+
+test('image-to-image rejects payloads without a reference image', async () => {
+    const { mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+
+    assert.throws(
+        () =>
+            mapImageToImagePayload({
+                baseImage: { url: 'https://example.test/base.webp' },
+                imageType: 'architecture',
+                referenceImages: [],
+                projectId: 101,
+                teamId: 202,
+            }),
+        /at least one reference image/i,
+    );
+});
+
+test('image-to-image readiness requires both base and reference images', async () => {
+    const { hasRequiredImageToImageInputs } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+
+    assert.equal(
+        hasRequiredImageToImageInputs({
+            baseImage: { url: 'https://example.test/base.webp' },
+            referenceImages: [],
+        }),
+        false,
+    );
+    assert.equal(
+        hasRequiredImageToImageInputs({
+            referenceImages: [{ url: 'https://example.test/reference.webp' }],
+        }),
+        false,
+    );
+    assert.equal(
+        hasRequiredImageToImageInputs({
+            baseImage: { url: 'https://example.test/base.webp' },
+            referenceImages: [{ url: 'https://example.test/reference.webp' }],
+        }),
+        true,
+    );
+});
+
+test('image-to-image rejects payloads without a base image', async () => {
+    const { mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+
+    assert.throws(
+        () =>
+            mapImageToImagePayload({
+                imageType: 'architecture',
+                referenceImages: [
+                    {
+                        url: 'https://example.test/reference.webp',
+                        tags: ['architecture.design_approach'],
+                    },
+                ],
+                projectId: 101,
+                teamId: 202,
+            }),
+        /requires a base image/i,
+    );
+});
+
+test('image-to-image rejects an unsupported image category', async () => {
+    const { mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+
+    assert.throws(
+        () =>
+            mapImageToImagePayload({
+                baseImage: { url: 'https://example.test/base.webp' },
+                imageType: 'product',
+                referenceImages: [
+                    {
+                        url: 'https://example.test/reference.webp',
+                        tags: ['architecture.design_approach'],
+                    },
+                ],
+                projectId: 101,
+                teamId: 202,
+            }),
+        /unsupported image category/i,
+    );
 });
 
 test('image-to-image emits the same canonical reference categories as the full frontend', async () => {
@@ -291,10 +407,60 @@ test('manual category changes preserve images, reset their directions, and ignor
         'urban.visual_style',
     ]);
     assert.deepEqual(changed.form.referenceImages[1].tags, ['urban.urban_design_approach']);
+    assert.equal(changed.form.categoryNotice, 'urban');
 
     const repeated = changeReferenceImageCategory(changed.form, 'urban');
     assert.equal(repeated.changed, false);
     assert.equal(repeated.form, changed.form);
+});
+
+test('category changes remove template assets without removing user uploads', async () => {
+    const { changeReferenceImageCategory } = await server.ssrLoadModule(
+        '/src/data/referenceImageTags.ts',
+    );
+    const userBaseImage = {
+        id: 'user-base',
+        sourceType: 'user-upload',
+        tags: [],
+    };
+    const userReference = {
+        id: 'user-reference',
+        sourceType: 'user-upload',
+        tags: ['architecture.visual_style'],
+    };
+    const form = {
+        baseImageType: 'architecture',
+        baseImage: userBaseImage,
+        referenceImages: [
+            {
+                id: 'template-reference',
+                sourceType: 'template',
+                tags: ['architecture.facade_design'],
+            },
+            userReference,
+        ],
+        prompt: '',
+        language: 'en',
+    };
+
+    const changed = changeReferenceImageCategory(form, 'interior', {
+        removeTemplateAssets: true,
+    });
+
+    assert.equal(changed.form.baseImage, userBaseImage);
+    assert.deepEqual(
+        changed.form.referenceImages.map(({ id }) => id),
+        ['user-reference'],
+    );
+    assert.deepEqual(changed.form.referenceImages[0].tags, [
+        'interior.spatial_design',
+        'interior.materials_finishes',
+        'interior.interior_surfaces',
+        'interior.furnishings_decor',
+        'interior.lighting_atmosphere',
+        'interior.visual_style',
+    ]);
+    assert.equal(changed.form.categoryNotice, 'interior');
 });
 
 test('newly uploaded references receive category defaults in upload order', async () => {
@@ -312,6 +478,73 @@ test('newly uploaded references receive category defaults in upload order', asyn
         'landscape.visual_style',
     ]);
     assert.deepEqual(second[1].tags, ['landscape.landscape_design']);
+});
+
+test('reference direction selection cannot remove the final valid option', async () => {
+    const { toggleReferenceImageTag } = await server.ssrLoadModule(
+        '/src/data/referenceImageTags.ts',
+    );
+    const available = [
+        'urban.urban_design_approach',
+        'urban.street_block_frontages',
+        'urban.material_system',
+    ];
+
+    assert.deepEqual(
+        toggleReferenceImageTag(
+            ['urban.urban_design_approach'],
+            'urban.urban_design_approach',
+            available,
+        ),
+        ['urban.urban_design_approach'],
+    );
+    assert.deepEqual(
+        toggleReferenceImageTag(
+            ['architecture.facade_design', 'urban.material_system'],
+            'urban.street_block_frontages',
+            available,
+        ),
+        ['urban.street_block_frontages', 'urban.material_system'],
+    );
+});
+
+test('category controls expose their selected state to assistive technology', async () => {
+    const { OptionGrid } = await server.ssrLoadModule('/src/components/RefinementControls.tsx');
+    const markup = renderToStaticMarkup(
+        createElement(OptionGrid, {
+            options: [
+                { id: 'architecture', en: 'Architecture', chs: '建筑' },
+                { id: 'interior', en: 'Interior', chs: '室内' },
+            ],
+            language: 'en',
+            selected: ['interior'],
+            onToggle: () => undefined,
+            className: 'base-types',
+        }),
+    );
+
+    assert.match(markup, /aria-pressed="false"[^>]*>.*Architecture/);
+    assert.match(markup, /aria-pressed="true"[^>]*>.*Interior/);
+});
+
+test('invalidating a template request prevents its later callbacks from committing', async () => {
+    const { createLatestRequestGate } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/latestRequest.ts',
+    );
+    const gate = createLatestRequestGate();
+
+    const firstRequest = gate.begin();
+    assert.equal(gate.isCurrent(firstRequest), true);
+
+    assert.equal(gate.invalidate(), true);
+    assert.equal(gate.isCurrent(firstRequest), false);
+    assert.equal(gate.invalidate(), false);
+
+    const secondRequest = gate.begin();
+    assert.equal(gate.isCurrent(secondRequest), true);
+    assert.notEqual(secondRequest, firstRequest);
+    assert.equal(gate.complete(secondRequest), true);
+    assert.equal(gate.isCurrent(secondRequest), false);
 });
 
 test('template selection numbers resolve through the template category', async () => {

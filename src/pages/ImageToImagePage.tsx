@@ -10,6 +10,7 @@ import { getReferenceImageTags } from '../data/referenceImageTags';
 import { v3Templates } from '../data/v3/cases';
 import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
+import { hasRequiredImageToImageInputs } from '../features/generation/imageToImage';
 
 export function ImageToImagePage() {
     const { t, i18n } = useTranslation();
@@ -22,8 +23,6 @@ export function ImageToImagePage() {
         templateOpen,
         setTemplateOpen,
         selectedTemplateId,
-        categoryNotice,
-        setCategoryNotice,
         baseStatus,
         baseError,
         referenceError,
@@ -42,15 +41,21 @@ export function ImageToImagePage() {
     }, [language, setForm]);
 
     useEffect(() => {
-        if (!categoryNotice) return;
-        const timer = window.setTimeout(() => setCategoryNotice(undefined), 5000);
+        if (!form.categoryNotice) return;
+        const timer = window.setTimeout(
+            () =>
+                setForm((current) =>
+                    current.categoryNotice ? { ...current, categoryNotice: undefined } : current,
+                ),
+            5000,
+        );
         return () => window.clearTimeout(timer);
-    }, [categoryNotice, setCategoryNotice]);
+    }, [form.categoryNotice, setForm]);
 
     const activeTags = form.referenceImages[activeReference]?.tags ?? [];
     const referenceTagOptions = getReferenceImageTags(form.baseImageType);
-    const categoryNoticeLabel = categoryNotice
-        ? options.baseTypes.find(({ id }) => id === categoryNotice)?.[language]
+    const categoryNoticeLabel = form.categoryNotice
+        ? options.baseTypes.find(({ id }) => id === form.categoryNotice)?.[language]
         : undefined;
     const templateLoading = templateStatus === 'loading';
     const baseLoading =
@@ -185,7 +190,7 @@ export function ImageToImagePage() {
                     className="refinement-generate"
                     type="button"
                     disabled={
-                        !form.baseImage ||
+                        !hasRequiredImageToImageInputs(form) ||
                         baseStatus !== 'success' ||
                         templateLoading ||
                         referenceLoading ||

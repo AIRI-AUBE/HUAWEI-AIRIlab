@@ -1,4 +1,8 @@
-import { referenceImageTags, type ReferenceImageTag } from '../data/referenceImageTags';
+import {
+    referenceImageTags,
+    toggleReferenceImageTag,
+    type ReferenceImageTag,
+} from '../data/referenceImageTags';
 
 type Props = {
     selectedIds: string[];
@@ -18,9 +22,11 @@ export function ReferenceImageTagSelector({
     const selected = new Set(selectedIds);
     const toggle = (id: string) => {
         onChange(
-            selected.has(id)
-                ? selectedIds.filter((selectedId) => selectedId !== id)
-                : [...selected, id],
+            toggleReferenceImageTag(
+                selectedIds,
+                id,
+                options.map((option) => option.id),
+            ),
         );
     };
 
