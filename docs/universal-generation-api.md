@@ -76,8 +76,13 @@ distinguishing fields are:
 
 The mapper also supplies workflow-39's fixed generation settings, including dimensions, quality, style defaults, and
 control values. A base image and at least one reference image are required; image-to-image supports one through three
-reference images. Local object URLs are preview-only and are never submitted. The prompt input is optional; its value is
-mirrored into `enteredText`, `additionalPrompt`, and `prompt`, with all three submitted as empty strings when omitted.
+reference images, and every submitted image must have a persisted URL. Local object URLs are preview-only and are never
+submitted. The prompt input is optional and limited to 6,000 characters; its value is mirrored into `enteredText`,
+`additionalPrompt`, and `prompt`, with all three submitted as empty strings when omitted.
+
+Manual uploads and template loads own cancellable request tokens. Selecting a template cancels stale manual uploads,
+while a manual edit cancels a stale template load. Template assets are staged off-form and applied in one transaction
+only after every upload succeeds, so failed or superseded templates cannot leave partial assets in the form.
 
 ## Polling and results
 

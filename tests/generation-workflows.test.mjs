@@ -81,6 +81,7 @@ test('image-to-image emits workflow 39 with uploaded images and no prompt', asyn
     ]);
     assert.equal(payload.enteredText, '');
     assert.equal(payload.prompt, '');
+    assert.equal(payload.designLibraryName, '');
     assert.equal('aspectRatio' in payload, false);
 });
 
@@ -150,6 +151,54 @@ test('image-to-image readiness requires both base and reference images', async (
             referenceImages: [{ url: 'https://example.test/reference.webp' }],
         }),
         true,
+    );
+});
+
+test('image-to-image requires every reference to have a persisted URL', async () => {
+    const { hasRequiredImageToImageInputs, mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+    const input = {
+        baseImage: { url: 'https://example.test/base.webp' },
+        imageType: 'architecture',
+        referenceImages: [
+            {
+                url: '',
+                tags: ['architecture.design_approach'],
+            },
+        ],
+        projectId: 101,
+        teamId: 202,
+    };
+
+    assert.equal(hasRequiredImageToImageInputs(input), false);
+    assert.throws(() => mapImageToImagePayload(input), /persisted reference image url/i);
+});
+
+test('image-to-image accepts 6,000 prompt characters and rejects 6,001', async () => {
+    const { mapImageToImagePayload } = await server.ssrLoadModule(
+        '/src/features/generation/imageToImage.ts',
+    );
+    const input = {
+        baseImage: { url: 'https://example.test/base.webp' },
+        imageType: 'architecture',
+        referenceImages: [
+            {
+                url: 'https://example.test/reference.webp',
+                tags: ['architecture.design_approach'],
+            },
+        ],
+        projectId: 101,
+        teamId: 202,
+    };
+
+    assert.equal(
+        mapImageToImagePayload({ ...input, prompt: 'x'.repeat(6000) }).prompt.length,
+        6000,
+    );
+    assert.throws(
+        () => mapImageToImagePayload({ ...input, prompt: 'x'.repeat(6001) }),
+        /6,000 characters/i,
     );
 });
 
@@ -535,9 +584,14 @@ test('invalidating a template request prevents its later callbacks from committi
 
     const firstRequest = gate.begin();
     assert.equal(gate.isCurrent(firstRequest), true);
+    assert.equal(gate.hasActive(), true);
+    const firstSignal = gate.signal(firstRequest);
+    assert.equal(firstSignal.aborted, false);
 
     assert.equal(gate.invalidate(), true);
     assert.equal(gate.isCurrent(firstRequest), false);
+    assert.equal(gate.hasActive(), false);
+    assert.equal(firstSignal.aborted, true);
     assert.equal(gate.invalidate(), false);
 
     const secondRequest = gate.begin();
@@ -545,6 +599,61 @@ test('invalidating a template request prevents its later callbacks from committi
     assert.notEqual(secondRequest, firstRequest);
     assert.equal(gate.complete(secondRequest), true);
     assert.equal(gate.isCurrent(secondRequest), false);
+    assert.equal(gate.hasActive(), false);
+});
+
+test('reference uploads never append beyond the configured maximum', async () => {
+    const { appendUploadedImagesWithinLimit } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/uploadTransactions.ts',
+    );
+    const existing = [{ id: 'one' }, { id: 'two' }];
+    const incoming = [{ id: 'three' }, { id: 'four' }];
+
+    assert.deepEqual(appendUploadedImagesWithinLimit?.(existing, incoming, 3), [
+        { id: 'one' },
+        { id: 'two' },
+        { id: 'three' },
+    ]);
+});
+
+test('template uploads are staged as one complete result', async () => {
+    const { stageTemplateUploads } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/uploadTransactions.ts',
+    );
+    const baseAsset = { id: 'base', previewUrl: '/base.webp', tags: [] };
+    const referenceAssets = [
+        { id: 'reference-one', previewUrl: '/one.webp', tags: ['design'] },
+        { id: 'reference-two', previewUrl: '/two.webp', tags: ['material'] },
+    ];
+    const staged = await stageTemplateUploads?.({
+        baseAsset,
+        referenceAssets,
+        upload: async (asset, role) => ({
+            ...asset,
+            url: `https://example.test/${role}/${asset.id}.webp`,
+            sourceType: 'template',
+        }),
+    });
+
+    assert.deepEqual(staged, {
+        baseImage: {
+            ...baseAsset,
+            url: 'https://example.test/base-image/base.webp',
+            sourceType: 'template',
+        },
+        referenceImages: [
+            {
+                ...referenceAssets[0],
+                url: 'https://example.test/reference-image/reference-one.webp',
+                sourceType: 'template',
+            },
+            {
+                ...referenceAssets[1],
+                url: 'https://example.test/reference-image/reference-two.webp',
+                sourceType: 'template',
+            },
+        ],
+    });
 });
 
 test('template selection numbers resolve through the template category', async () => {

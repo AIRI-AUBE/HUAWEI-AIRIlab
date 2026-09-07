@@ -19,7 +19,7 @@ export type ImageToImagePayload = {
     workflowVersion: 'V3';
     enteredText: string;
     additionalPrompt: string;
-    designLibraryName: 'No Style';
+    designLibraryName: '';
     designLibraryId: 99;
     firstTierName: 'No Style';
     firstTierId: 9999;

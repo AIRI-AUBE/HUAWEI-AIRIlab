@@ -10,7 +10,10 @@ import { getReferenceImageTags } from '../data/referenceImageTags';
 import { v3Templates } from '../data/v3/cases';
 import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
-import { hasRequiredImageToImageInputs } from '../features/generation/imageToImage';
+import {
+    hasRequiredImageToImageInputs,
+    imageToImagePromptMaxLength,
+} from '../features/generation/imageToImage';
 
 export function ImageToImagePage() {
     const { t, i18n } = useTranslation();
@@ -179,6 +182,7 @@ export function ImageToImagePage() {
                     >
                         <textarea
                             value={form.prompt}
+                            maxLength={imageToImagePromptMaxLength}
                             onChange={(event) =>
                                 setForm((current) => ({ ...current, prompt: event.target.value }))
                             }

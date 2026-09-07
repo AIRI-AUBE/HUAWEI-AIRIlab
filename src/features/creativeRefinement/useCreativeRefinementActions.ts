@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     appendReferenceImage,
@@ -16,73 +16,144 @@ import {
 } from '../imageUpload/pipeline';
 import { useCreativeRefinement } from './CreativeRefinementContext';
 import { createLatestRequestGate } from './latestRequest';
+import { appendUploadedImagesWithinLimit, stageTemplateUploads } from './uploadTransactions';
 
 export function useCreativeRefinementActions() {
     const { t } = useTranslation();
     const state = useCreativeRefinement();
     const generationLock = useRef(false);
+    const generationAbort = useRef<AbortController | undefined>(undefined);
     const templateRequestGate = useRef(createLatestRequestGate());
+    const baseUploadRequestGate = useRef(createLatestRequestGate());
+    const referenceUploadRequestGate = useRef(createLatestRequestGate());
 
     const invalidatePendingTemplateLoad = () => {
         if (!templateRequestGate.current.invalidate()) return;
         state.setLoadingTemplateId(undefined);
         state.setTemplateStatus('idle');
         state.setTemplateError('');
-        state.setBaseStatus('idle');
-        state.setReferenceStatus('idle');
         state.setReferenceLoadingCount(0);
     };
+
+    const invalidatePendingManualUploads = () => {
+        if (baseUploadRequestGate.current.invalidate()) {
+            state.setBaseStatus(state.form.baseImage ? 'success' : 'idle');
+        }
+        if (referenceUploadRequestGate.current.invalidate()) {
+            state.setReferenceStatus(state.form.referenceImages.length ? 'success' : 'idle');
+            state.setReferenceLoadingCount(0);
+        }
+    };
+
+    useEffect(
+        () => () => {
+            templateRequestGate.current.invalidate();
+            baseUploadRequestGate.current.invalidate();
+            referenceUploadRequestGate.current.invalidate();
+            generationAbort.current?.abort();
+        },
+        [],
+    );
 
     const addBase = async (files: File[]) => {
         if (!files[0]) return;
         invalidatePendingTemplateLoad();
+        const requestId = baseUploadRequestGate.current.begin();
+        const signal = baseUploadRequestGate.current.signal(requestId);
+        const isCurrentRequest = () => baseUploadRequestGate.current.isCurrent(requestId);
         state.setBaseError('');
         try {
-            const image = await runImageUploadPipeline(files[0], 'base-image', state.setBaseStatus);
+            const image = await runImageUploadPipeline(
+                files[0],
+                'base-image',
+                (status) => {
+                    if (isCurrentRequest()) state.setBaseStatus(status);
+                },
+                signal,
+            );
+            if (!isCurrentRequest()) {
+                disposeUploadedImage(image);
+                return;
+            }
             state.setForm((current) => {
                 disposeUploadedImage(current.baseImage);
                 return { ...current, baseImage: image };
             });
         } catch (error) {
+            if (!isCurrentRequest()) return;
             state.setBaseStatus('error');
             state.setBaseError(errorMessage(error));
+        } finally {
+            baseUploadRequestGate.current.complete(requestId);
         }
     };
 
     const addReferences = async (files: File[]) => {
+        if (referenceUploadRequestGate.current.hasActive()) return;
         invalidatePendingTemplateLoad();
         const available = Math.max(0, 3 - state.form.referenceImages.length);
         const acceptedFiles = files.slice(0, available);
-        state.setReferenceLoadingCount(acceptedFiles.length);
         state.setReferenceError(
             files.length > available ? t('imageToImage.tooManyReferences') : '',
         );
-        for (const file of acceptedFiles) {
-            try {
-                const image = await runImageUploadPipeline(
-                    file,
-                    'reference-image',
-                    state.setReferenceStatus,
-                );
-                state.setForm((current) => ({
-                    ...current,
-                    referenceImages: appendReferenceImage(
-                        current.referenceImages,
-                        image,
-                        current.baseImageType,
-                    ),
-                }));
-            } catch (error) {
-                state.setReferenceStatus('error');
-                state.setReferenceError(`${file.name}: ${errorMessage(error)}`);
-            } finally {
-                state.setReferenceLoadingCount((count) => Math.max(0, count - 1));
+        if (!acceptedFiles.length) return;
+
+        const requestId = referenceUploadRequestGate.current.begin();
+        const signal = referenceUploadRequestGate.current.signal(requestId);
+        const isCurrentRequest = () => referenceUploadRequestGate.current.isCurrent(requestId);
+        state.setReferenceLoadingCount(acceptedFiles.length);
+        try {
+            for (const file of acceptedFiles) {
+                if (!isCurrentRequest()) break;
+                try {
+                    const image = await runImageUploadPipeline(
+                        file,
+                        'reference-image',
+                        (status) => {
+                            if (isCurrentRequest()) state.setReferenceStatus(status);
+                        },
+                        signal,
+                    );
+                    if (!isCurrentRequest()) {
+                        disposeUploadedImage(image);
+                        break;
+                    }
+                    state.setForm((current) => {
+                        const appended = appendReferenceImage(
+                            current.referenceImages,
+                            image,
+                            current.baseImageType,
+                        );
+                        const [taggedImage] = appended.slice(current.referenceImages.length);
+                        const next = appendUploadedImagesWithinLimit(
+                            current.referenceImages,
+                            [taggedImage],
+                            3,
+                        );
+                        if (next.length === current.referenceImages.length) {
+                            disposeUploadedImage(image);
+                            return current;
+                        }
+                        return { ...current, referenceImages: next };
+                    });
+                } catch (error) {
+                    if (!isCurrentRequest()) break;
+                    state.setReferenceStatus('error');
+                    state.setReferenceError(`${file.name}: ${errorMessage(error)}`);
+                } finally {
+                    if (isCurrentRequest()) {
+                        state.setReferenceLoadingCount((count) => Math.max(0, count - 1));
+                    }
+                }
             }
+        } finally {
+            referenceUploadRequestGate.current.complete(requestId);
         }
     };
 
     const removeBase = () => {
         invalidatePendingTemplateLoad();
+        baseUploadRequestGate.current.invalidate();
         state.setForm((current) => {
             disposeUploadedImage(current.baseImage);
             state.setBaseStatus('idle');
@@ -124,97 +195,82 @@ export function useCreativeRefinementActions() {
     const selectTemplate = async (template: V3Template) => {
         const selectedCase = getV3Case(template.caseId);
         if (!selectedCase) return;
+        invalidatePendingManualUploads();
         const requestId = templateRequestGate.current.begin();
         const isCurrentRequest = () => templateRequestGate.current.isCurrent(requestId);
+        const signal = templateRequestGate.current.signal(requestId);
         state.setLoadingTemplateId(template.id);
         state.setTemplateStatus('loading');
         state.setTemplateOpen(false);
         state.setTemplateError('');
-        state.setBaseStatus('idle');
         state.setReferenceLoadingCount(
             [selectedCase.ref1Image, selectedCase.ref2Image, selectedCase.ref3Image].filter(Boolean)
                 .length,
         );
-        state.setForm((current) => {
-            if (current.baseImage?.file) disposeUploadedImage(current.baseImage);
-            current.referenceImages.filter((image) => image.file).forEach(disposeUploadedImage);
-            return {
-                ...current,
-                baseImageType: template.baseImageType,
-                baseImage: undefined,
-                referenceImages: [],
-                categoryNotice: undefined,
-            };
-        });
         try {
             const loaded = await loadTemplateCase(template.caseId);
             if (!isCurrentRequest()) return;
-            state.setForm((current) => ({
-                ...current,
-                baseImageType: loaded.baseImageType,
-                prompt: loaded.prompt || current.prompt,
-            }));
-
-            const baseUpload = loaded.baseImage
-                ? runTemplateImageUploadPipeline(
-                      loaded.baseImage.previewUrl,
-                      'base-image',
-                      (status) => {
-                          if (isCurrentRequest()) state.setBaseStatus(status);
-                      },
-                  ).then((baseImage) => {
-                      if (isCurrentRequest()) {
-                          state.setForm((current) => ({ ...current, baseImage }));
-                      }
-                      return baseImage;
-                  })
-                : Promise.resolve(undefined);
-            const referenceUploads = loaded.referenceImages.map(async (image, index) => {
-                try {
-                    const uploaded = {
-                        ...(await runTemplateImageUploadPipeline(
-                            image.previewUrl,
-                            'reference-image',
-                            (status) => {
-                                if (isCurrentRequest()) state.setReferenceStatus(status);
-                            },
-                        )),
-                        id: `${template.id}-reference-${index}`,
-                        tags: image.tags,
-                    };
-                    if (isCurrentRequest()) {
-                        state.setForm((current) => ({
-                            ...current,
-                            referenceImages: [...current.referenceImages, uploaded].sort(
-                                (left, right) => left.id.localeCompare(right.id),
-                            ),
-                        }));
+            const staged = await stageTemplateUploads({
+                baseAsset: loaded.baseImage,
+                referenceAssets: loaded.referenceImages,
+                upload: async (asset, role, index) => {
+                    try {
+                        const uploaded = await runTemplateImageUploadPipeline(
+                            asset.previewUrl,
+                            role,
+                            undefined,
+                            signal,
+                        );
+                        return {
+                            ...uploaded,
+                            id:
+                                role === 'reference-image'
+                                    ? `${template.id}-reference-${index}`
+                                    : `${template.id}-base`,
+                            tags: asset.tags,
+                        };
+                    } finally {
+                        if (role === 'reference-image' && isCurrentRequest()) {
+                            state.setReferenceLoadingCount((count) => Math.max(0, count - 1));
+                        }
                     }
-                    return uploaded;
-                } finally {
-                    if (isCurrentRequest()) {
-                        state.setReferenceLoadingCount((count) => Math.max(0, count - 1));
-                    }
-                }
+                },
             });
-            const results = await Promise.allSettled([baseUpload, ...referenceUploads]);
             if (!isCurrentRequest()) return;
-            const failed = results.find(
-                (result): result is PromiseRejectedResult => result.status === 'rejected',
-            );
-            if (failed) throw failed.reason;
 
+            state.setForm((current) => {
+                if (!isCurrentRequest()) {
+                    disposeUploadedImage(staged.baseImage);
+                    staged.referenceImages.forEach(disposeUploadedImage);
+                    return current;
+                }
+                disposeUploadedImage(current.baseImage);
+                current.referenceImages.forEach(disposeUploadedImage);
+                return {
+                    ...current,
+                    baseImageType: loaded.baseImageType,
+                    baseImage: staged.baseImage,
+                    referenceImages: staged.referenceImages,
+                    prompt: loaded.prompt || current.prompt,
+                    categoryNotice: undefined,
+                };
+            });
             state.setSelectedTemplateId(template.id);
             state.setTemplateStatus('success');
+            state.setBaseStatus(staged.baseImage ? 'success' : 'idle');
+            state.setReferenceStatus(staged.referenceImages.length ? 'success' : 'idle');
             state.setBaseError('');
             state.setReferenceError('');
             state.setActiveReference(0);
         } catch (error) {
             if (!isCurrentRequest()) return;
+            templateRequestGate.current.invalidate();
             state.setTemplateStatus('error');
             state.setTemplateError(
                 error instanceof Error ? error.message : t('imageToImage.templateError'),
             );
+            state.setReferenceLoadingCount(0);
+            state.setLoadingTemplateId(undefined);
         } finally {
             if (isCurrentRequest()) {
                 state.setReferenceLoadingCount(0);
@@ -227,6 +283,8 @@ export function useCreativeRefinementActions() {
     const startGeneration = async () => {
         if (generationLock.current || !state.form.baseImage) return;
         generationLock.current = true;
+        const controller = new AbortController();
+        generationAbort.current = controller;
         state.setGenerationStatus('validating');
         state.setGenerationError('');
         state.setOutputs([]);
@@ -240,10 +298,10 @@ export function useCreativeRefinementActions() {
                 language: state.form.language,
             });
             state.setGenerationStatus('submitting');
-            const jobId = await generate(payload);
+            const jobId = await generate(payload, controller.signal);
             state.setJobId(jobId);
             state.setGenerationStatus('generating');
-            const result = await waitForResult(jobId);
+            const result = await waitForResult(jobId, { signal: controller.signal });
             const outputs = (result.outputs ?? []).filter(
                 (output) => typeof output.url === 'string' && output.url.length > 0,
             );
@@ -251,12 +309,16 @@ export function useCreativeRefinementActions() {
             state.setOutputs(outputs);
             state.setGenerationStatus('completed');
         } catch (error) {
+            if (controller.signal.aborted) return;
             state.setGenerationStatus('failed');
             state.setGenerationError(
                 error instanceof Error ? error.message : t('imageToImage.generationFailed'),
             );
         } finally {
-            generationLock.current = false;
+            if (generationAbort.current === controller) {
+                generationAbort.current = undefined;
+                generationLock.current = false;
+            }
         }
     };
 

@@ -6,10 +6,17 @@ import { imageToImageConfig } from '../imageUpload/config';
 import type { UploadedImage } from '../imageUpload/types';
 import type { ImageToImagePayload } from './types';
 
+export const imageToImagePromptMaxLength = 6000;
+
 export const hasRequiredImageToImageInputs = (input: {
     baseImage?: { url: string };
     referenceImages: Array<{ url: string }>;
-}) => Boolean(input.baseImage?.url && input.referenceImages.length);
+}) =>
+    Boolean(
+        input.baseImage?.url &&
+        input.referenceImages.length &&
+        input.referenceImages.every(({ url }) => url),
+    );
 
 export const mapImageToImagePayload = (input: {
     baseImage?: UploadedImage;
@@ -37,8 +44,16 @@ export const mapImageToImagePayload = (input: {
     if (!input.referenceImages.length) {
         throw new Error('Workflow 39 requires at least one reference image.');
     }
+    if (input.referenceImages.some(({ url }) => !url)) {
+        throw new Error(
+            'Workflow 39 requires a persisted reference image URL for every reference.',
+        );
+    }
     if (input.referenceImages.length > imageToImageConfig.maxReferenceImages) {
         throw new Error('Workflow 39 accepts at most three reference images.');
+    }
+    if (prompt.length > imageToImagePromptMaxLength) {
+        throw new Error('Workflow 39 accepts prompts up to 6,000 characters.');
     }
     return {
         toolsetEntry: 1,
@@ -59,7 +74,7 @@ export const mapImageToImagePayload = (input: {
         workflowVersion: imageToImageConfig.workflowVersion,
         enteredText: prompt,
         additionalPrompt: prompt,
-        designLibraryName: 'No Style',
+        designLibraryName: '',
         designLibraryId: 99,
         firstTierName: 'No Style',
         firstTierId: 9999,
