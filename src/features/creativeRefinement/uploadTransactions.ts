@@ -28,6 +28,19 @@ export const deriveSettledUploadStatuses = (form: {
     reference: form.referenceImages.length ? ('success' as const) : ('idle' as const),
 });
 
+export const applyManualFormEdit = <T>({
+    invalidate,
+    enqueue,
+    update,
+}: {
+    invalidate: () => unknown;
+    enqueue: (update: (current: T) => T) => void;
+    update: (current: T) => T;
+}) => {
+    invalidate();
+    enqueue(update);
+};
+
 export const stageTemplateUploads = async <TAsset, TUploaded>({
     baseAsset,
     referenceAssets,

@@ -166,14 +166,7 @@ export function ImageToImagePage() {
                             language={language}
                             options={referenceTagOptions}
                             selectedIds={activeTags}
-                            onChange={(tags) =>
-                                setForm((current) => ({
-                                    ...current,
-                                    referenceImages: current.referenceImages.map((image, index) =>
-                                        index === activeReference ? { ...image, tags } : image,
-                                    ),
-                                }))
-                            }
+                            onChange={actions.updateReferenceTags}
                         />
                     </RefinementSection>
                     <RefinementSection
@@ -183,9 +176,7 @@ export function ImageToImagePage() {
                         <textarea
                             value={form.prompt}
                             maxLength={imageToImagePromptMaxLength}
-                            onChange={(event) =>
-                                setForm((current) => ({ ...current, prompt: event.target.value }))
-                            }
+                            onChange={(event) => actions.updatePrompt(event.target.value)}
                             placeholder={t('imageToImage.promptPlaceholder')}
                         />
                     </RefinementSection>

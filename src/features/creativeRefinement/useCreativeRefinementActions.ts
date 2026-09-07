@@ -17,6 +17,7 @@ import {
 import { useCreativeRefinement } from './CreativeRefinementContext';
 import { createLatestRequestGate } from './latestRequest';
 import {
+    applyManualFormEdit,
     appendUploadedImagesWithinLimit,
     deriveSettledUploadStatuses,
     enqueueLatestRequestStateUpdate,
@@ -199,6 +200,27 @@ export function useCreativeRefinementActions() {
         });
     };
 
+    const updateReferenceTags = (tags: string[]) => {
+        applyManualFormEdit({
+            invalidate: invalidatePendingTemplateLoad,
+            enqueue: state.setForm,
+            update: (current) => ({
+                ...current,
+                referenceImages: current.referenceImages.map((image, index) =>
+                    index === state.activeReference ? { ...image, tags } : image,
+                ),
+            }),
+        });
+    };
+
+    const updatePrompt = (prompt: string) => {
+        applyManualFormEdit({
+            invalidate: invalidatePendingTemplateLoad,
+            enqueue: state.setForm,
+            update: (current) => ({ ...current, prompt }),
+        });
+    };
+
     const selectBaseImageType = (baseImageType: string) => {
         if (!isReferenceImageCategory(baseImageType)) return;
         const nextType = baseImageType;
@@ -359,6 +381,8 @@ export function useCreativeRefinementActions() {
         addReferences,
         removeBase,
         removeReference,
+        updateReferenceTags,
+        updatePrompt,
         selectBaseImageType,
         selectTemplate,
         startGeneration,

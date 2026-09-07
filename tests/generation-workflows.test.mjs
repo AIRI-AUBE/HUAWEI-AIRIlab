@@ -699,6 +699,29 @@ test('upload status recovery reflects assets retained across route navigation', 
     );
 });
 
+test('manual form edits invalidate a pending template before updating state', async () => {
+    const { createLatestRequestGate } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/latestRequest.ts',
+    );
+    const { applyManualFormEdit } = await server.ssrLoadModule(
+        '/src/features/creativeRefinement/uploadTransactions.ts',
+    );
+    const gate = createLatestRequestGate();
+    const templateRequest = gate.begin();
+    let form = { prompt: 'template prompt' };
+
+    applyManualFormEdit?.({
+        invalidate: () => gate.invalidate(),
+        enqueue: (update) => {
+            form = update(form);
+        },
+        update: (current) => ({ ...current, prompt: 'manual prompt' }),
+    });
+
+    assert.equal(gate.isCurrent(templateRequest), false);
+    assert.deepEqual(form, { prompt: 'manual prompt' });
+});
+
 test('template selection numbers resolve through the template category', async () => {
     const { caseToFormAssets, getV3Case } = await server.ssrLoadModule('/src/data/v3/cases.ts');
     const template = getV3Case('case-006');

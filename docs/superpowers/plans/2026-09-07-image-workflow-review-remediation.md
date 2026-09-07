@@ -279,3 +279,52 @@ if (baseUploadRequestGate.current.invalidate()) {
 npm run test:contracts
 npm run test:types
 ```
+
+### Task 6: Manual field-edit ownership
+
+**Files:**
+
+- Modify: `src/features/creativeRefinement/uploadTransactions.ts`
+- Modify: `src/features/creativeRefinement/useCreativeRefinementActions.ts`
+- Modify: `src/pages/ImageToImagePage.tsx`
+- Test: `tests/generation-workflows.test.mjs`
+
+**Interfaces:**
+
+- Consumes: the template request invalidator and functional form updater
+- Produces: prompt and reference-tag edits that cancel an active template before updating state
+
+- [x] **Step 1: Write a failing ownership test**
+
+```js
+applyManualFormEdit({
+    invalidate: () => gate.invalidate(),
+    enqueue,
+    update,
+});
+assert.equal(gate.isCurrent(templateRequest), false);
+assert.deepEqual(form, { prompt: 'manual prompt' });
+```
+
+- [x] **Step 2: Run the contract test and verify the request remains active**
+
+```powershell
+npm run test:contracts
+```
+
+- [x] **Step 3: Route prompt and tag edits through one invalidating form-edit action**
+
+```ts
+applyManualFormEdit({
+    invalidate: invalidatePendingTemplateLoad,
+    enqueue: state.setForm,
+    update,
+});
+```
+
+- [x] **Step 4: Run contract and type tests**
+
+```powershell
+npm run test:contracts
+npm run test:types
+```
