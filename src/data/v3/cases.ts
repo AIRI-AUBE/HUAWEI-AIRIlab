@@ -1,8 +1,8 @@
 import manifest from './manifest.json';
-import { referenceImageTags } from '../referenceImageTags';
+import { getReferenceImageTags, type ReferenceImageCategory } from '../referenceImageTags';
 import type { UploadedImage } from '../../features/imageUpload/types';
 
-export type BaseImageType = 'architecture' | 'interior' | 'landscape' | 'urban';
+export type BaseImageType = ReferenceImageCategory;
 
 type ManifestCase = (typeof manifest.cases)[number];
 
@@ -61,34 +61,40 @@ const caseAsset = (
     caseId: string,
     role: string,
     url: string,
+    category: BaseImageType | undefined,
     selections: number[] = [],
 ): UploadedImage => ({
     id: `${caseId}-${role}`,
     url,
     previewUrl: url,
     tags: selections.flatMap((selection) => {
-        const tag = referenceImageTags[selection - 1];
+        const tag = category ? getReferenceImageTags(category)[selection - 1] : undefined;
         return tag ? [tag.id] : [];
     }),
     uploadStatus: 'success',
     sourceType: 'template',
 });
 
-export const caseToFormAssets = (item: ManifestCase) => ({
-    baseImage: item.baseImage ? caseAsset(item.id, 'base', item.baseImage) : undefined,
-    referenceImages: [
-        item.ref1Image
-            ? caseAsset(item.id, 'ref-1', item.ref1Image, item.ref1Selections)
+export const caseToFormAssets = (item: ManifestCase) => {
+    const category = normalizeV3Category(item.type);
+    return {
+        baseImage: item.baseImage
+            ? caseAsset(item.id, 'base', item.baseImage, category)
             : undefined,
-        item.ref2Image
-            ? caseAsset(item.id, 'ref-2', item.ref2Image, item.ref2Selections)
-            : undefined,
-        item.ref3Image
-            ? caseAsset(item.id, 'ref-3', item.ref3Image, item.ref3Selections)
-            : undefined,
-    ].filter((image): image is UploadedImage => Boolean(image)),
-    expectedOutput: item.expectedOutput,
-});
+        referenceImages: [
+            item.ref1Image
+                ? caseAsset(item.id, 'ref-1', item.ref1Image, category, item.ref1Selections)
+                : undefined,
+            item.ref2Image
+                ? caseAsset(item.id, 'ref-2', item.ref2Image, category, item.ref2Selections)
+                : undefined,
+            item.ref3Image
+                ? caseAsset(item.id, 'ref-3', item.ref3Image, category, item.ref3Selections)
+                : undefined,
+        ].filter((image): image is UploadedImage => Boolean(image)),
+        expectedOutput: item.expectedOutput,
+    };
+};
 
 const resolveLocalAsset = (url: string) =>
     new Promise<void>((resolve, reject) => {

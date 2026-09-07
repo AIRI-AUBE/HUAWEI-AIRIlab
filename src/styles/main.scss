@@ -1139,9 +1139,38 @@ a {
     text-align: center;
 }
 
+.category-options-hint {
+    width: 172px;
+    margin: 7px 0 0;
+    color: $color-text-subtle;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
 .control-label--tags {
     margin: 6px 0 4px 4px;
     color: $color-text-muted;
+    font-weight: 600;
+}
+
+.category-reset-notice {
+    width: 158px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 0 0 7px;
+    padding: 7px 9px;
+    border: 1px solid rgba($color-text-selected, 0.3);
+    border-radius: 8px;
+    background: rgba($color-text-selected, 0.08);
+    color: $color-text-secondary;
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+.category-reset-notice strong {
+    color: $color-text-selected;
+    font-size: 10px;
     font-weight: 600;
 }
 

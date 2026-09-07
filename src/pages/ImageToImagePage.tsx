@@ -6,6 +6,7 @@ import { OptionGrid, RefinementSection } from '../components/RefinementControls'
 import { ReferenceImageTagSelector } from '../components/ReferenceImageTagSelector';
 import { V3TemplateSelector } from '../components/V3TemplateSelector';
 import options from '../data/imageToImageOptions.json';
+import { getReferenceImageTags } from '../data/referenceImageTags';
 import { v3Templates } from '../data/v3/cases';
 import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
 import { useCreativeRefinementActions } from '../features/creativeRefinement/useCreativeRefinementActions';
@@ -21,6 +22,8 @@ export function ImageToImagePage() {
         templateOpen,
         setTemplateOpen,
         selectedTemplateId,
+        categoryNotice,
+        setCategoryNotice,
         baseStatus,
         baseError,
         referenceError,
@@ -38,7 +41,17 @@ export function ImageToImagePage() {
         setForm((current) => (current.language === language ? current : { ...current, language }));
     }, [language, setForm]);
 
+    useEffect(() => {
+        if (!categoryNotice) return;
+        const timer = window.setTimeout(() => setCategoryNotice(undefined), 5000);
+        return () => window.clearTimeout(timer);
+    }, [categoryNotice, setCategoryNotice]);
+
     const activeTags = form.referenceImages[activeReference]?.tags ?? [];
+    const referenceTagOptions = getReferenceImageTags(form.baseImageType);
+    const categoryNoticeLabel = categoryNotice
+        ? options.baseTypes.find(({ id }) => id === categoryNotice)?.[language]
+        : undefined;
     const templateLoading = templateStatus === 'loading';
     const baseLoading =
         !form.baseImage &&
@@ -99,6 +112,9 @@ export function ImageToImagePage() {
                             selected={[form.baseImageType]}
                             onToggle={actions.selectBaseImageType}
                         />
+                        <p className="category-options-hint">
+                            {t('imageToImage.categoryOptionsHint')}
+                        </p>
                     </RefinementSection>
                     <RefinementSection
                         title={t('imageToImage.referenceHeading')}
@@ -127,9 +143,20 @@ export function ImageToImagePage() {
                         <p className="control-label control-label--tags">
                             {t('imageToImage.tags')}
                         </p>
+                        {categoryNoticeLabel && (
+                            <div className="category-reset-notice" role="status">
+                                <strong>
+                                    {t('imageToImage.categorySwitched', {
+                                        category: categoryNoticeLabel,
+                                    })}
+                                </strong>
+                                <span>{t('imageToImage.categoryResetNotice')}</span>
+                            </div>
+                        )}
                         <ReferenceImageTagSelector
                             className="reference-tags"
                             language={language}
+                            options={referenceTagOptions}
                             selectedIds={activeTags}
                             onChange={(tags) =>
                                 setForm((current) => ({

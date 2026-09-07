@@ -36,6 +36,8 @@ type CreativeRefinementContextValue = {
     setTemplateOpen: Setter<boolean>;
     selectedTemplateId?: string;
     setSelectedTemplateId: Setter<string | undefined>;
+    categoryNotice?: BaseImageType;
+    setCategoryNotice: Setter<BaseImageType | undefined>;
     baseStatus: UploadStatus;
     setBaseStatus: Setter<UploadStatus>;
     baseError: string;
@@ -76,6 +78,7 @@ export function CreativeRefinementProvider({ children }: { children: ReactNode }
     const [activeReference, setActiveReference] = useState(0);
     const [templateOpen, setTemplateOpen] = useState(false);
     const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
+    const [categoryNotice, setCategoryNotice] = useState<BaseImageType>();
     const [baseStatus, setBaseStatus] = useState<UploadStatus>('idle');
     const [baseError, setBaseError] = useState('');
     const [referenceError, setReferenceError] = useState('');
@@ -107,6 +110,8 @@ export function CreativeRefinementProvider({ children }: { children: ReactNode }
             setTemplateOpen,
             selectedTemplateId,
             setSelectedTemplateId,
+            categoryNotice,
+            setCategoryNotice,
             baseStatus,
             setBaseStatus,
             baseError,
@@ -137,6 +142,7 @@ export function CreativeRefinementProvider({ children }: { children: ReactNode }
             activeReference,
             templateOpen,
             selectedTemplateId,
+            categoryNotice,
             baseStatus,
             baseError,
             referenceError,

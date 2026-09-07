@@ -1,4 +1,4 @@
-import { referenceImageTagPayloadValues } from '../../data/referenceImageTags';
+import { toReferenceImagePayloadCategories } from '../../data/referenceImageTags';
 import { imageToImageConfig } from '../imageUpload/config';
 import type { UploadedImage } from '../imageUpload/types';
 import type { ImageToImagePayload } from './types';
@@ -16,6 +16,7 @@ export const mapImageToImagePayload = (input: {
     const projectId = Number(input.projectId ?? import.meta.env.VITE_AIRI_PROJECT_ID);
     const teamId = Number(input.teamId ?? import.meta.env.VITE_AIRI_TEAM_ID);
     const prompt = input.prompt ?? '';
+    const imageType = input.imageType ?? 'architecture';
     if (!Number.isInteger(projectId) || projectId < 1 || !Number.isInteger(teamId) || teamId < 0) {
         throw new Error('Valid numeric project and team configuration is required.');
     }
@@ -34,11 +35,9 @@ export const mapImageToImagePayload = (input: {
         referenceImage: input.referenceImages.map(({ url, tags }) => ({
             url,
             weight: 0,
-            categories: (tags ?? [])
-                .map((tag) => referenceImageTagPayloadValues[tag])
-                .filter((category): category is string => Boolean(category)),
+            categories: toReferenceImagePayloadCategories(imageType, tags ?? []),
         })),
-        imageType: input.imageType ?? 'architecture',
+        imageType,
         workflowId: imageToImageConfig.workflowId,
         workflowVersion: imageToImageConfig.workflowVersion,
         enteredText: prompt,

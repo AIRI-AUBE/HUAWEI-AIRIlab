@@ -1,6 +1,12 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getV3Case, loadTemplateCase, type V3Template } from '../../data/v3/cases';
+import { appendReferenceImage, changeReferenceImageCategory } from '../../data/referenceImageTags';
+import {
+    getV3Case,
+    loadTemplateCase,
+    type BaseImageType,
+    type V3Template,
+} from '../../data/v3/cases';
 import { mapImageToImagePayload } from '../generation/imageToImage';
 import { generate, waitForResult } from '../generation/universalGeneration';
 import {
@@ -47,7 +53,11 @@ export function useCreativeRefinementActions() {
                 );
                 state.setForm((current) => ({
                     ...current,
-                    referenceImages: [...current.referenceImages, image],
+                    referenceImages: appendReferenceImage(
+                        current.referenceImages,
+                        image,
+                        current.baseImageType,
+                    ),
                 }));
             } catch (error) {
                 state.setReferenceStatus('error');
@@ -75,19 +85,25 @@ export function useCreativeRefinementActions() {
         });
 
     const selectBaseImageType = (baseImageType: string) => {
+        const nextType = baseImageType as BaseImageType;
+        if (nextType === state.form.baseImageType) return;
+
+        const resetExistingReferences =
+            !state.selectedTemplateId && state.form.referenceImages.length > 0;
         state.setForm((current) => {
             if (!state.selectedTemplateId) {
-                return { ...current, baseImageType: baseImageType as typeof current.baseImageType };
+                return changeReferenceImageCategory(current, nextType).form;
             }
             if (current.baseImage?.file) disposeUploadedImage(current.baseImage);
             current.referenceImages.filter((image) => image.file).forEach(disposeUploadedImage);
             return {
                 ...current,
-                baseImageType: baseImageType as typeof current.baseImageType,
+                baseImageType: nextType,
                 baseImage: undefined,
                 referenceImages: [],
             };
         });
+        state.setCategoryNotice(resetExistingReferences ? nextType : undefined);
         if (state.selectedTemplateId) {
             state.setBaseStatus('idle');
             state.setReferenceStatus('idle');
@@ -102,6 +118,7 @@ export function useCreativeRefinementActions() {
     const selectTemplate = async (template: V3Template) => {
         const selectedCase = getV3Case(template.caseId);
         if (!selectedCase) return;
+        state.setCategoryNotice(undefined);
         state.setLoadingTemplateId(template.id);
         state.setTemplateStatus('loading');
         state.setTemplateOpen(false);
