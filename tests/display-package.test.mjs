@@ -53,6 +53,7 @@ test(
                 outputRoot,
                 '-PackageName',
                 packageName,
+                '-AllowEmbeddedCredentials',
             ],
             { cwd: process.cwd() },
         );
@@ -277,5 +278,50 @@ test(
             apiBaseUrl: 'https://process.example.test',
             uploadPath: '/process/upload',
         });
+    },
+);
+
+test(
+    'requires explicit authorization before packaging browser-embedded credentials',
+    { skip: process.platform !== 'win32' },
+    async (t) => {
+        const temporaryRoot = await mkdtemp(join(tmpdir(), 'airi-display-credential-gate-'));
+        const distPath = join(temporaryRoot, 'dist');
+        const environmentPath = join(temporaryRoot, '.env');
+        const outputRoot = join(temporaryRoot, 'output');
+        await mkdir(distPath);
+        await writeFile(join(distPath, 'index.html'), '<div id="root"></div>');
+        await writeFile(
+            environmentPath,
+            [
+                'VITE_AIRI_API_BASE_URL=https://api.example.test',
+                'VITE_AIRI_AUTH_TOKEN=embedded-test-credential',
+            ].join('\n'),
+        );
+        t.after(() => rm(temporaryRoot, { recursive: true, force: true }));
+
+        const result = await run(
+            'powershell.exe',
+            [
+                '-NoProfile',
+                '-ExecutionPolicy',
+                'Bypass',
+                '-File',
+                join(process.cwd(), 'scripts', 'package-display.ps1'),
+                '-DistPath',
+                distPath,
+                '-EnvironmentPath',
+                environmentPath,
+                '-OutputRoot',
+                outputRoot,
+                '-PackageName',
+                'AIRI-Display-Unauthorized-Test',
+            ],
+            { cwd: process.cwd() },
+        );
+
+        assert.notEqual(result.code, 0);
+        assert.match(`${result.stdout}\n${result.stderr}`, /browser-embedded credentials/i);
+        await assert.rejects(access(join(outputRoot, 'AIRI-Display-Unauthorized-Test.zip')));
     },
 );

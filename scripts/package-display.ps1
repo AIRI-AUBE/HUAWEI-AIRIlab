@@ -3,7 +3,8 @@ param(
     [string]$EnvironmentPath,
     [string]$EnvironmentRoot = (Split-Path $PSScriptRoot -Parent),
     [string]$OutputRoot = (Split-Path $PSScriptRoot -Parent),
-    [string]$PackageName = ('AIRI-Display-Windows-{0}' -f (Get-Date -Format 'yyyy-MM-dd'))
+    [string]$PackageName = ('AIRI-Display-Windows-{0}' -f (Get-Date -Format 'yyyy-MM-dd')),
+    [switch]$AllowEmbeddedCredentials
 )
 
 $ErrorActionPreference = 'Stop'
@@ -54,7 +55,12 @@ foreach ($environmentFile in $environmentFiles) {
         }
     }
 }
-foreach ($variableName in @('VITE_AIRI_API_BASE_URL', 'VITE_AIRI_UPLOAD_PATH')) {
+foreach ($variableName in @(
+    'VITE_AIRI_API_BASE_URL',
+    'VITE_AIRI_UPLOAD_PATH',
+    'VITE_AIRI_AUTH_TOKEN',
+    'VITE_AIRI_API_KEY'
+)) {
     $processValue = [System.Environment]::GetEnvironmentVariable($variableName, 'Process')
     if ($null -ne $processValue) {
         $environment[$variableName] = $processValue
@@ -73,6 +79,22 @@ if (-not [System.Uri]::TryCreate($apiBaseUrl, [System.UriKind]::Absolute, [ref]$
 }
 if (-not $uploadPath.StartsWith('/')) {
     throw 'VITE_AIRI_UPLOAD_PATH must begin with /.'
+}
+
+$embeddedCredentialNames = @(
+    'VITE_AIRI_AUTH_TOKEN',
+    'VITE_AIRI_API_KEY'
+) | Where-Object {
+    -not [string]::IsNullOrWhiteSpace([string]$environment[$_])
+}
+if ($embeddedCredentialNames.Count -gt 0 -and -not $AllowEmbeddedCredentials) {
+    throw ('The build uses browser-embedded credentials ({0}). ' +
+        'Use the explicitly authorized internal-package command only for trusted recipients.' -f
+        ($embeddedCredentialNames -join ', '))
+}
+if ($embeddedCredentialNames.Count -gt 0) {
+    Write-Warning ('AUTHORIZED INTERNAL PACKAGE: browser-embedded credentials are present: {0}' -f
+        ($embeddedCredentialNames -join ', '))
 }
 
 New-Item -ItemType Directory -Path $resolvedOutputRoot -Force | Out-Null
