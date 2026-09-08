@@ -71,6 +71,16 @@ test(
         ]) {
             await access(join(packageRoot, path));
         }
+        for (const commandFile of [
+            'check-windows-architecture.cmd',
+            'diagnose-upload.cmd',
+            'start-display.cmd',
+        ]) {
+            const commandText = await readFile(join(packageRoot, commandFile), 'utf8');
+            assert.match(commandText, /\r\n/);
+            assert.doesNotMatch(commandText, /(?<!\r)\n/);
+            assert.doesNotMatch(commandText, /[^\x00-\x7F]/);
+        }
         const configText = await readFile(join(packageRoot, 'display-config.json'), 'utf8');
         const config = JSON.parse(configText.replace(/^\uFEFF/, ''));
         assert.deepEqual(config, {
@@ -214,6 +224,58 @@ test(
         assert.deepEqual(JSON.parse(configText.replace(/^\uFEFF/, '')), {
             apiBaseUrl: 'https://production-local.example.test',
             uploadPath: '/custom/upload',
+        });
+    },
+);
+
+test(
+    'packages successfully from Vite process environment variables without env files',
+    { skip: process.platform !== 'win32' },
+    async (t) => {
+        const temporaryRoot = await mkdtemp(join(tmpdir(), 'airi-display-process-env-'));
+        const distPath = join(temporaryRoot, 'dist');
+        const environmentRoot = join(temporaryRoot, 'empty-environment');
+        const outputRoot = join(temporaryRoot, 'output');
+        await mkdir(distPath);
+        await mkdir(environmentRoot);
+        await writeFile(join(distPath, 'index.html'), '<div id="root"></div>');
+        t.after(() => rm(temporaryRoot, { recursive: true, force: true }));
+
+        const result = await run(
+            'powershell.exe',
+            [
+                '-NoProfile',
+                '-ExecutionPolicy',
+                'Bypass',
+                '-File',
+                join(process.cwd(), 'scripts', 'package-display.ps1'),
+                '-DistPath',
+                distPath,
+                '-EnvironmentRoot',
+                environmentRoot,
+                '-OutputRoot',
+                outputRoot,
+                '-PackageName',
+                'AIRI-Display-Process-Env-Test',
+            ],
+            {
+                cwd: process.cwd(),
+                env: {
+                    ...process.env,
+                    VITE_AIRI_API_BASE_URL: 'https://process.example.test',
+                    VITE_AIRI_UPLOAD_PATH: '/process/upload',
+                },
+            },
+        );
+
+        assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+        const configText = await readFile(
+            join(outputRoot, 'AIRI-Display-Process-Env-Test', 'display-config.json'),
+            'utf8',
+        );
+        assert.deepEqual(JSON.parse(configText.replace(/^\uFEFF/, '')), {
+            apiBaseUrl: 'https://process.example.test',
+            uploadPath: '/process/upload',
         });
     },
 );

@@ -35,9 +35,6 @@ else {
         Test-Path -LiteralPath $_ -PathType Leaf
     }
 }
-if ($environmentFiles.Count -eq 0) {
-    throw "No Vite environment files were found in $resolvedEnvironmentRoot."
-}
 foreach ($environmentFile in $environmentFiles) {
     if (-not (Test-Path -LiteralPath $environmentFile -PathType Leaf)) {
         throw "Environment file not found at $environmentFile."
@@ -110,7 +107,20 @@ foreach ($file in $packageFiles) {
     if (-not (Test-Path -LiteralPath $file.Source -PathType Leaf)) {
         throw "Required package file not found: $($file.Source)"
     }
-    Copy-Item -LiteralPath $file.Source -Destination (Join-Path $packageDirectory $file.Name)
+    $destinationPath = Join-Path $packageDirectory $file.Name
+    Copy-Item -LiteralPath $file.Source -Destination $destinationPath
+    if ([System.IO.Path]::GetExtension($file.Name) -ieq '.cmd') {
+        $commandText = [System.IO.File]::ReadAllText($destinationPath)
+        if ($commandText -match '[^\x00-\x7F]') {
+            throw "Command launcher must contain ASCII only: $($file.Source)"
+        }
+        $commandText = $commandText.Replace("`r`n", "`n").Replace("`n", "`r`n")
+        [System.IO.File]::WriteAllText(
+            $destinationPath,
+            $commandText,
+            [System.Text.UTF8Encoding]::new($false)
+        )
+    }
 }
 
 $config = [ordered]@{
