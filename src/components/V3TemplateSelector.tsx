@@ -35,7 +35,15 @@ export function V3TemplateSelector({
             if (!(panel instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
             const panelRect = panel.getBoundingClientRect();
             const triggerRect = trigger.getBoundingClientRect();
-            setPosition({ top: triggerRect.top - 8, left: panelRect.right });
+            const popupWidth = popoverRef.current?.offsetWidth ?? 188;
+            const popupHeight = popoverRef.current?.offsetHeight ?? 594;
+            setPosition({
+                top: Math.max(
+                    8,
+                    Math.min(triggerRect.top - 8, window.innerHeight - popupHeight - 8),
+                ),
+                left: Math.max(8, Math.min(panelRect.right, window.innerWidth - popupWidth - 8)),
+            });
         };
         updatePosition();
         window.addEventListener('resize', updatePosition);
@@ -54,7 +62,18 @@ export function V3TemplateSelector({
             }
         };
         document.addEventListener('pointerdown', close);
-        return () => document.removeEventListener('pointerdown', close);
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onOpenChange(false);
+                rootRef.current?.querySelector('button')?.focus();
+            }
+        };
+        popoverRef.current?.querySelector('button')?.focus();
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', close);
+            document.removeEventListener('keydown', onKeyDown);
+        };
     }, [open, onOpenChange]);
 
     return (

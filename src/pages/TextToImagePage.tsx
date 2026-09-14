@@ -5,6 +5,9 @@ import { PromptTemplateModal } from '../components/PromptTemplateModal';
 import { generate, waitForResult } from '../features/generation/universalGeneration';
 import { mapTextToImagePayload } from '../features/generation/textToImage';
 import type { GenerationOutput } from '../features/generation/types';
+import { VoiceInputButton } from '../components/VoiceInputButton';
+import { useVoiceInput } from '../hooks/useVoiceInput';
+import { insertSpeech } from '../features/speech/insertSpeech';
 
 type GenerationStatus = 'idle' | 'submitting' | 'generating' | 'completed' | 'failed';
 
@@ -13,6 +16,26 @@ export function TextToImagePage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [prompt, setPrompt] = useState('');
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const pendingCursor = useRef<number | null>(null);
+    const speech = useVoiceInput((text) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+        const insertion = insertSpeech(
+            textarea.value,
+            text,
+            textarea.selectionStart,
+            textarea.selectionEnd,
+        );
+        pendingCursor.current = insertion.cursor;
+        setPrompt(insertion.text);
+    });
+    useEffect(() => {
+        if (pendingCursor.current !== null) {
+            textareaRef.current?.setSelectionRange(pendingCursor.current, pendingCursor.current);
+            pendingCursor.current = null;
+        }
+    }, [prompt]);
     const [generationStatus, setGenerationStatus] = useState<GenerationStatus>('idle');
     const [generationError, setGenerationError] = useState('');
     const [output, setOutput] = useState<GenerationOutput>();
@@ -126,13 +149,7 @@ export function TextToImagePage() {
                     </>
                 )}
                 <div className="prompt-composer__row">
-                    <button
-                        type="button"
-                        className="square-control"
-                        aria-label={t('textToImage.voice')}
-                    >
-                        <img className="voice-icon" src="/assets/figma/voice.svg" alt="" />
-                    </button>
+                    <VoiceInputButton speech={speech} />
                     <div className="prompt-field">
                         <button
                             type="button"
@@ -154,6 +171,7 @@ export function TextToImagePage() {
                             />
                         </button>
                         <textarea
+                            ref={textareaRef}
                             value={prompt}
                             onChange={(event) => setPrompt(event.target.value)}
                             aria-label={t('textToImage.promptLabel')}

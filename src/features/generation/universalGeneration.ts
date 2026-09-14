@@ -21,15 +21,19 @@ const failureStates = new Set([
 const baseUrl = () => (import.meta.env.VITE_AIRI_API_BASE_URL ?? '').replace(/\/$/, '');
 const delay = (ms: number, signal?: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
-        const id = window.setTimeout(resolve, ms);
-        signal?.addEventListener(
-            'abort',
-            () => {
-                window.clearTimeout(id);
-                reject(new DOMException('Aborted', 'AbortError'));
-            },
-            { once: true },
-        );
+        if (signal?.aborted) {
+            reject(new DOMException('Aborted', 'AbortError'));
+            return;
+        }
+        const abort = () => {
+            window.clearTimeout(id);
+            reject(new DOMException('Aborted', 'AbortError'));
+        };
+        const id = window.setTimeout(() => {
+            signal?.removeEventListener('abort', abort);
+            resolve();
+        }, ms);
+        signal?.addEventListener('abort', abort, { once: true });
     });
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
@@ -51,7 +55,10 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
         throw error;
     }
     const body = (await response.json()) as { status?: number; message?: string; data?: T } & T;
-    if (body.status && body.status !== 200) {
+    if (!body || typeof body !== 'object') {
+        throw new Error('The generation API returned an invalid response.');
+    }
+    if (typeof body.status === 'number' && body.status !== 200) {
         throw new Error(body.message || `Generation request failed (${body.status}).`);
     }
     return (body.data ?? body) as T;
@@ -77,6 +84,9 @@ export const waitForResult = async (
         const job = await request<JobState>(`/api/Universal/Job/${encodeURIComponent(jobId)}`, {
             signal: options.signal,
         });
+        if (typeof job.status !== 'string') {
+            throw new Error('The generation API returned an invalid job status.');
+        }
         const status = job.status.trim().toLowerCase();
         if (failureStates.has(status)) throw new Error(job.message || 'Generation failed.');
         if (successStates.has(status)) {

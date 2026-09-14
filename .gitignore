@@ -149,5 +149,8 @@ vite.config.ts.timestamp-*
 **/AIRI-Diagnostic-Report.txt
 
 # Python bytecode caches
+.venv/
+backend/.model-cache/
 __pycache__/
 *.py[cod]
+/.npm-cache/

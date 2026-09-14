@@ -54,6 +54,7 @@ export function ImageUploadField({
         }
     };
     const keyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.target !== event.currentTarget) return;
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             inputRef.current?.click();
@@ -116,6 +117,13 @@ export function ImageUploadField({
                                     aria-label={t('imageToImage.removeImageLabel', {
                                         number: index + 1,
                                     })}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            onRemove(index);
+                                        }
+                                    }}
                                     onClick={(event) => {
                                         event.stopPropagation();
                                         onRemove(index);

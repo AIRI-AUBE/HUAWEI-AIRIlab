@@ -1,0 +1,133 @@
+[
+    {
+        "name": "English",
+        "language": "en",
+        "script": "Latin",
+        "text": "Create a modern library at dusk",
+        "http_status": 200,
+        "actual": {
+            "text": "Create a modern library at dusk",
+            "language": "en"
+        },
+        "language_matches": true
+    },
+    {
+        "name": "Chinese",
+        "language": "zh",
+        "script": "Han",
+        "text": "创建一个黄昏时分的现代图书馆",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Japanese",
+        "language": "ja",
+        "script": "Japanese",
+        "text": "夕暮れの現代的な図書館を作ってください",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Korean",
+        "language": "ko",
+        "script": "Hangul",
+        "text": "현대적인 도서관을 만들어 주세요",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "French",
+        "language": "fr",
+        "script": "Latin",
+        "text": "Créez une bibliothèque moderne au crépuscule",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "German",
+        "language": "de",
+        "script": "Latin",
+        "text": "Erstelle eine moderne Bibliothek in der Dämmerung",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Spanish",
+        "language": "es",
+        "script": "Latin",
+        "text": "Crea una biblioteca moderna al anochecer",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Italian",
+        "language": "it",
+        "script": "Latin",
+        "text": "Crea una biblioteca moderna al tramonto",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Portuguese",
+        "language": "pt",
+        "script": "Latin",
+        "text": "Crie uma biblioteca moderna ao anoitecer",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Russian",
+        "language": "ru",
+        "script": "Cyrillic",
+        "text": "Создай современную библиотеку на закате",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Arabic",
+        "language": "ar",
+        "script": "Arabic",
+        "text": "أنشئ مكتبة حديثة عند الغروب",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Hindi",
+        "language": "hi",
+        "script": "Devanagari",
+        "text": "शाम के समय एक आधुनिक पुस्तकालय बनाएं",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Tamil",
+        "language": "ta",
+        "script": "Tamil",
+        "text": "மாலை நேரத்தில் ஒரு நவீன நூலகத்தை உருவாக்கவும்",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Telugu",
+        "language": "te",
+        "script": "Telugu",
+        "text": "సాయంత్రం సమయంలో ఒక ఆధునిక గ్రంథాలయాన్ని సృష్టించండి",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Malayalam",
+        "language": "ml",
+        "script": "Malayalam",
+        "text": "സന്ധ്യാസമയത്ത് ഒരു ആധുനിക ലൈബ്രറി സൃഷ്ടിക്കുക",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Kannada",
+        "language": "kn",
+        "script": "Kannada",
+        "text": "ಸಂಜೆಯ ಸಮಯದಲ್ಲಿ ಆಧುನಿಕ ಗ್ರಂಥಾಲಯವನ್ನು ರಚಿಸಿ",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Bengali",
+        "language": "bn",
+        "script": "Bengali",
+        "text": "সন্ধ্যায় একটি আধুনিক লাইব্রেরি তৈরি করুন",
+        "status": "not tested: recording missing"
+    },
+    {
+        "name": "Silence",
+        "http_status": 422,
+        "actual": {
+            "detail": "No speech detected."
+        }
+    }
+]

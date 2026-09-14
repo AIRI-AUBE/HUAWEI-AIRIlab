@@ -10,7 +10,8 @@
         "preview": "vite preview",
         "test": "npm run test:types && npm run test:contracts",
         "test:types": "tsc -p tsconfig.app.json --noEmit --pretty false && tsc -p tsconfig.node.json --noEmit --pretty false",
-        "test:contracts": "node --test tests/generation-workflows.test.mjs",
+        "test:contracts": "node --test tests/generation-workflows.test.mjs tests/speech-recognition.test.mjs",
+        "test:browser": "node --test tests/browser-audit.test.mjs",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
@@ -25,6 +26,7 @@
         "@types/react": "^19.2.2",
         "@types/react-dom": "^19.2.2",
         "@vitejs/plugin-react": "^6.1.1",
+        "playwright-core": "^1.63.0",
         "prettier": "^3.9.6",
         "sass": "^1.103.1",
         "typescript": "^7.0.2",

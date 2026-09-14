@@ -21,6 +21,60 @@ after(async () => {
     await server?.close();
 });
 
+test('generation polling accepts bare and enveloped statuses and cleans abort listeners', async (t) => {
+    const api = await server.ssrLoadModule('/src/features/generation/universalGeneration.ts');
+    const oldWindow = globalThis.window;
+    globalThis.window = { setTimeout, clearTimeout };
+    t.after(() => {
+        globalThis.window = oldWindow;
+    });
+    const controller = new AbortController();
+    const added = t.mock.method(controller.signal, 'addEventListener');
+    const removed = t.mock.method(controller.signal, 'removeEventListener');
+    let polls = 0;
+    t.mock.method(globalThis, 'fetch', async (url) => {
+        if (url.endsWith('/result'))
+            return Response.json({ data: { outputs: [{ url: 'result.png' }] } });
+        polls++;
+        return Response.json(
+            polls === 1 ? { data: { status: 'running' } } : { status: 'completed' },
+        );
+    });
+    assert.deepEqual(await api.waitForResult('job', { intervalMs: 1, signal: controller.signal }), {
+        outputs: [{ url: 'result.png' }],
+    });
+    assert.equal(added.mock.callCount(), 1);
+    assert.equal(removed.mock.callCount(), 1);
+    assert.equal(added.mock.calls[0].arguments[1], removed.mock.calls[0].arguments[1]);
+});
+
+test('generation client rejects malformed, failed and timed-out jobs and honors cancellation', async (t) => {
+    const api = await server.ssrLoadModule('/src/features/generation/universalGeneration.ts');
+    const oldWindow = globalThis.window;
+    globalThis.window = { setTimeout, clearTimeout };
+    t.after(() => {
+        globalThis.window = oldWindow;
+    });
+    for (const body of [
+        null,
+        {},
+        { status: 200, data: {} },
+        { status: 'failed', message: 'Job failed' },
+    ]) {
+        t.mock.method(globalThis, 'fetch', async () => Response.json(body));
+        await assert.rejects(api.waitForResult('job'), /invalid|failed/i);
+    }
+    await assert.rejects(api.waitForResult('job', { timeoutMs: 0 }), /timed out/);
+    const controller = new AbortController();
+    t.mock.method(globalThis, 'fetch', async () => {
+        controller.abort();
+        return Response.json({ status: 'running' });
+    });
+    await assert.rejects(api.waitForResult('job', { signal: controller.signal }), {
+        name: 'AbortError',
+    });
+});
+
 test('text-to-image emits the workflow 44 contract without image inputs', async () => {
     const { mapTextToImagePayload } = await server.ssrLoadModule(
         '/src/features/generation/textToImage.ts',

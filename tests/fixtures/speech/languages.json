@@ -1,0 +1,104 @@
+[
+    {
+        "name": "English",
+        "language": "en",
+        "script": "Latin",
+        "text": "Create a modern library at dusk"
+    },
+    {
+        "name": "Chinese",
+        "language": "zh",
+        "script": "Han",
+        "text": "创建一个黄昏时分的现代图书馆"
+    },
+    {
+        "name": "Japanese",
+        "language": "ja",
+        "script": "Japanese",
+        "text": "夕暮れの現代的な図書館を作ってください"
+    },
+    {
+        "name": "Korean",
+        "language": "ko",
+        "script": "Hangul",
+        "text": "현대적인 도서관을 만들어 주세요"
+    },
+    {
+        "name": "French",
+        "language": "fr",
+        "script": "Latin",
+        "text": "Créez une bibliothèque moderne au crépuscule"
+    },
+    {
+        "name": "German",
+        "language": "de",
+        "script": "Latin",
+        "text": "Erstelle eine moderne Bibliothek in der Dämmerung"
+    },
+    {
+        "name": "Spanish",
+        "language": "es",
+        "script": "Latin",
+        "text": "Crea una biblioteca moderna al anochecer"
+    },
+    {
+        "name": "Italian",
+        "language": "it",
+        "script": "Latin",
+        "text": "Crea una biblioteca moderna al tramonto"
+    },
+    {
+        "name": "Portuguese",
+        "language": "pt",
+        "script": "Latin",
+        "text": "Crie uma biblioteca moderna ao anoitecer"
+    },
+    {
+        "name": "Russian",
+        "language": "ru",
+        "script": "Cyrillic",
+        "text": "Создай современную библиотеку на закате"
+    },
+    {
+        "name": "Arabic",
+        "language": "ar",
+        "script": "Arabic",
+        "text": "أنشئ مكتبة حديثة عند الغروب"
+    },
+    {
+        "name": "Hindi",
+        "language": "hi",
+        "script": "Devanagari",
+        "text": "शाम के समय एक आधुनिक पुस्तकालय बनाएं"
+    },
+    {
+        "name": "Tamil",
+        "language": "ta",
+        "script": "Tamil",
+        "text": "மாலை நேரத்தில் ஒரு நவீன நூலகத்தை உருவாக்கவும்"
+    },
+    {
+        "name": "Telugu",
+        "language": "te",
+        "script": "Telugu",
+        "text": "సాయంత్రం సమయంలో ఒక ఆధునిక గ్రంథాలయాన్ని సృష్టించండి"
+    },
+    {
+        "name": "Malayalam",
+        "language": "ml",
+        "script": "Malayalam",
+        "text": "സന്ധ്യാസമയത്ത് ഒരു ആധുനിക ലൈബ്രറി സൃഷ്ടിക്കുക"
+    },
+    {
+        "name": "Kannada",
+        "language": "kn",
+        "script": "Kannada",
+        "text": "ಸಂಜೆಯ ಸಮಯದಲ್ಲಿ ಆಧುನಿಕ ಗ್ರಂಥಾಲಯವನ್ನು ರಚಿಸಿ"
+    },
+    {
+        "name": "Bengali",
+        "language": "bn",
+        "script": "Bengali",
+        "text": "সন্ধ্যায় একটি আধুনিক লাইব্রেরি তৈরি করুন"
+    }
+]

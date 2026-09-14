@@ -9,7 +9,11 @@ export function AppLayout() {
     const toggle = () => {
         const next = i18n.language.startsWith('en') ? 'chs' : 'en';
         void i18n.changeLanguage(next);
-        localStorage.setItem('airi-language', next);
+        try {
+            localStorage.setItem('airi-language', next);
+        } catch {
+            // The language switch still works when persistence is unavailable.
+        }
         document.documentElement.lang = next === 'chs' ? 'zh-CN' : 'en';
     };
     return (
