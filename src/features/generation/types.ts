@@ -11,7 +11,7 @@ export type ImageToImagePayload = {
     'referenceUploadGroup-container': true;
     'prompt-container': true;
     __generationSettings: { exploreV3: Record<string, never> };
-    megapixels: 1;
+    megapixels: 2;
     baseImage: string;
     referenceImage: ImageToImageReference[];
     imageType: string;

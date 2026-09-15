@@ -126,13 +126,6 @@ export function TextToImagePage() {
                     </>
                 )}
                 <div className="prompt-composer__row">
-                    <button
-                        type="button"
-                        className="square-control"
-                        aria-label={t('textToImage.voice')}
-                    >
-                        <img className="voice-icon" src="/assets/figma/voice.svg" alt="" />
-                    </button>
                     <div className="prompt-field">
                         <button
                             type="button"

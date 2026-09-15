@@ -92,7 +92,7 @@ export const mapImageToImagePayload = (input: {
         'referenceUploadGroup-container': true,
         'prompt-container': true,
         __generationSettings: { exploreV3: {} },
-        megapixels: 1,
+        megapixels: 2,
         baseImage: input.baseImage?.url ?? '',
         referenceImage: input.referenceImages.map(({ url, tags }) => ({
             url,

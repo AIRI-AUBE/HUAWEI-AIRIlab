@@ -415,7 +415,7 @@ a {
 
 .prompt-composer__row {
     display: grid;
-    grid-template-columns: 50.593px minmax(0, 650.476px) 50.593px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 7.228px;
 }
 
@@ -1559,10 +1559,6 @@ a {
     .preview-placeholder strong {
         max-width: 250px;
         font-size: 16px;
-    }
-
-    .prompt-composer__row {
-        grid-template-columns: 46px minmax(0, 1fr) 46px;
     }
 
     .square-control {
