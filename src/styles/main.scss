@@ -7,7 +7,7 @@
 }
 
 html {
-    color-scheme: dark;
+    color-scheme: light;
 }
 
 body {
@@ -56,7 +56,7 @@ a {
     padding: 0;
     border: 0;
     background: none;
-    color: $color-white;
+    color: $color-text;
     cursor: pointer;
     font-size: 28px;
     font-weight: 800;
@@ -64,9 +64,9 @@ a {
 }
 
 .brand img {
-    width: 41px;
-    height: 32px;
-    object-fit: fill;
+    width: 130px;
+    height: 50px;
+    object-fit: contain;
 }
 
 .nav {
@@ -139,8 +139,8 @@ a {
 }
 
 .app-shell--home .brand img {
-    width: 41px;
-    height: 32px;
+    width: 130px;
+    height: 50px;
 }
 
 .mode-section {
@@ -321,6 +321,7 @@ a {
     padding: 7px 16.72px 17.1px;
     border-radius: 21.683px;
     background: $color-surface;
+    box-shadow: inset 0 0 0 1px $color-border;
 }
 
 .preview-card__header {
@@ -570,7 +571,7 @@ a {
 
 .text-generation-error {
     margin: 8px 0 0;
-    color: #f87171;
+    color: $color-error;
     font-size: 12px;
     text-align: center;
 }
@@ -595,7 +596,7 @@ a {
     padding: 8px 10px;
     border-radius: 12px;
     outline: none;
-    background: $color-text-muted;
+    background: $color-panel;
     box-shadow:
         -1.205px 0 2.409px $color-popover-shadow-soft,
         1.205px 2.409px 4.818px $color-popover-shadow;
@@ -643,7 +644,7 @@ a {
 .prompt-option--selected,
 .prompt-option--selected:hover {
     background: $color-text-selected;
-    color: $color-ink;
+    color: $color-white;
 }
 
 .image-workspace {
@@ -663,6 +664,7 @@ a {
     overflow: hidden;
     border-radius: 24px;
     background: $color-panel;
+    box-shadow: inset 0 0 0 1px $color-border;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -702,7 +704,7 @@ a {
 .refinement-panel h1 {
     width: 188px;
     margin: 0 0 20px;
-    color: $color-white;
+    color: $color-text;
     font-size: 18px;
     font-weight: 800;
     line-height: normal;
@@ -718,7 +720,7 @@ a {
     padding: 0 14px;
     border: 0;
     border-radius: 8px;
-    background: $color-surface;
+    background: $color-control-alt;
     color: $color-text-secondary;
     cursor: pointer;
     font-family: 'Albert Sans', $font-sans;
@@ -756,7 +758,7 @@ a {
     padding: 8px 4px;
     border: 0;
     border-radius: 12px;
-    background: #8a8d93;
+    background: $color-panel;
     box-shadow:
         -1.205px 0 2.409px rgba(38, 50, 56, 0.02),
         1.205px 2.409px 4.818px rgba(38, 50, 56, 0.1);
@@ -909,7 +911,7 @@ a {
     width: 180px;
 }
 .image-upload--error {
-    border-color: #d94b4b;
+    border-color: $color-error;
 }
 .image-upload__status,
 .generation-error {
@@ -920,7 +922,7 @@ a {
 }
 .image-upload__status--error,
 .generation-error {
-    color: #ff8f8f;
+    color: $color-error;
 }
 .generation-error {
     position: absolute;
@@ -1023,7 +1025,7 @@ a {
     position: relative;
     z-index: 1;
     max-width: 90%;
-    color: $color-white;
+    color: $color-text;
     font-size: 9px;
     text-align: center;
 }
@@ -1037,7 +1039,7 @@ a {
 .template-error {
     width: 180px;
     margin: 5px 0 0;
-    color: #ff8f8f;
+    color: $color-error;
     font-size: 10px;
 }
 
@@ -1056,7 +1058,7 @@ a {
     padding: 2px 4px;
     border-radius: 3px;
     background: $color-control;
-    color: $color-white;
+    color: $color-text;
     font-size: 10px;
 }
 
@@ -1083,7 +1085,7 @@ a {
     flex: 0 0 32px;
     border-radius: 50%;
     background: $color-white;
-    color: $color-control;
+    color: $color-text;
     font-size: 24px;
 }
 
@@ -1128,7 +1130,8 @@ a {
 
 .base-types button.selected {
     border-color: $color-text-selected;
-    color: $color-text-selected;
+    background: $color-accent;
+    color: $color-white;
     text-align: center;
 }
 
@@ -1209,7 +1212,8 @@ a {
 
 .reference-tags button.selected {
     border-color: $color-text-selected;
-    color: $color-text-selected;
+    background: $color-accent;
+    color: $color-white;
     text-align: center;
 }
 
@@ -1310,6 +1314,7 @@ a {
     padding: 12px 18px 14px;
     border-radius: 24px;
     background: $color-surface;
+    box-shadow: inset 0 0 0 1px $color-border;
 }
 
 .image-preview-panel header {
@@ -1319,7 +1324,7 @@ a {
 
 .image-preview-panel h2 {
     margin: 0;
-    color: $color-white;
+    color: $color-text;
     font-size: 20px;
     font-weight: 800;
     line-height: 24px;
@@ -1376,7 +1381,7 @@ a {
 .generation-preview__status {
     position: relative;
     z-index: 1;
-    color: $color-white;
+    color: $color-text;
     font-size: 14px;
     font-weight: 600;
 }
@@ -1444,8 +1449,8 @@ a {
     }
 
     .brand img {
-        width: 32px;
-        height: 25px;
+        width: 104px;
+        height: 40px;
     }
 
     .nav {

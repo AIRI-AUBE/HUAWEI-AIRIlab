@@ -20,8 +20,7 @@ export function AppLayout() {
                     onClick={() => navigate('/')}
                     aria-label={t('common.homeLabel')}
                 >
-                    <img src="/assets/figma/huawei-logo.svg" alt="" />
-                    <span>HUAWEI</span>
+                    <img src="/assets/airi/logo.png" alt="AIRI Lab" />
                 </button>
                 <nav className="nav" aria-label={t('common.mainNavigation')}>
                     <NavLink to="/text-to-image">{t('nav.textToImage')}</NavLink>
