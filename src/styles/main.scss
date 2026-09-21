@@ -11,6 +11,7 @@ html {
 }
 
 body {
+    isolation: isolate;
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
@@ -18,6 +19,20 @@ body {
     color: $color-text;
     font-family: $font-sans;
     -webkit-font-smoothing: antialiased;
+}
+
+// Crop beyond the slide's overscan so no landscape enters the viewport.
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 132vh;
+    height: 132lvh;
+    z-index: -1;
+    pointer-events: none;
+    background: url('/assets/airi/starry-background.jpg') center top / cover no-repeat;
 }
 
 button,
@@ -595,7 +610,7 @@ a {
     padding: 8px 10px;
     border-radius: 12px;
     outline: none;
-    background: $color-text-muted;
+    background: $color-panel;
     box-shadow:
         -1.205px 0 2.409px $color-popover-shadow-soft,
         1.205px 2.409px 4.818px $color-popover-shadow;
@@ -623,7 +638,7 @@ a {
     border: 0;
     border-radius: 7px;
     background: $color-transparent;
-    color: $color-ink;
+    color: $color-white;
     cursor: pointer;
     font-family: 'Albert Sans', $font-sans;
     font-size: 14px;
@@ -642,8 +657,8 @@ a {
 
 .prompt-option--selected,
 .prompt-option--selected:hover {
-    background: $color-text-selected;
-    color: $color-ink;
+    background: #285578;
+    color: $color-white;
 }
 
 .image-workspace {
@@ -677,9 +692,10 @@ a {
 }
 
 .refinement-panel__scroll {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    padding: 16px 10px 70px 14px;
+    padding: 16px 10px 20px 14px;
     scrollbar-color: $color-text-secondary $color-transparent;
     scrollbar-width: thin;
 }
@@ -756,7 +772,7 @@ a {
     padding: 8px 4px;
     border: 0;
     border-radius: 12px;
-    background: #8a8d93;
+    background: $color-panel;
     box-shadow:
         -1.205px 0 2.409px rgba(38, 50, 56, 0.02),
         1.205px 2.409px 4.818px rgba(38, 50, 56, 0.1);
@@ -793,7 +809,7 @@ a {
 
 .template-group h2 {
     margin: 0 0 4px;
-    color: #263238;
+    color: $color-text;
     font-family: 'Albert Sans', $font-sans;
     font-size: 14px;
     font-weight: 400;
@@ -923,9 +939,11 @@ a {
     color: #ff8f8f;
 }
 .generation-error {
-    position: absolute;
-    bottom: 0;
-    width: 180px;
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0 24px 12px;
+    background: #0a1d30;
 }
 
 .refinement-section > .image-upload {
@@ -963,6 +981,11 @@ a {
     width: 16px;
     height: 16px;
     display: block;
+}
+
+.image-upload__icon img[src$='upload-reference.svg'] {
+    width: 32px;
+    height: 32px;
 }
 
 .image-upload__previews {
@@ -1240,16 +1263,20 @@ a {
 }
 
 .refinement-generate-shell {
-    position: absolute;
+    position: relative;
     z-index: 2;
-    width: 158px;
-    bottom: 14px;
-    height: 40px;
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+    border-top: 1px solid $color-border-alt;
+    background: #0a1d30;
 }
 
 .refinement-generate {
-    width: 100%;
-    height: 100%;
+    width: 158px;
+    height: 40px;
     border: 0;
     padding: 0;
     border-radius: 12px;
@@ -1262,7 +1289,35 @@ a {
 
 .refinement-generate:disabled {
     cursor: not-allowed;
-    opacity: 0.55;
+    background: rgba($color-accent, 0.55);
+}
+
+.refinement-panel {
+    .refinement-template,
+    .refinement-section h2,
+    .control-label,
+    .image-upload__empty,
+    .base-types button,
+    .reference-tags button,
+    .refinement-section textarea {
+        color: $color-white;
+    }
+
+    .category-options-hint,
+    .refinement-section textarea::placeholder {
+        color: #d4e3ef;
+    }
+
+    .image-upload:not(.image-upload--error),
+    .refinement-section textarea {
+        border-color: $color-border-alt;
+    }
+
+    .base-types button.selected,
+    .reference-tags button.selected {
+        background: #285578;
+        border-color: $color-white;
+    }
 }
 
 .refinement-generate-shell:focus-visible {

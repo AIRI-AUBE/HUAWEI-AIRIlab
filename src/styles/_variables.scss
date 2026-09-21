@@ -1,47 +1,47 @@
 $font-sans: Inter, 'HarmonyOS Sans SC', 'Microsoft YaHei', Arial, sans-serif;
 
-// Core Figma palette. Components consume these tokens instead of color literals.
+// Navy surfaces from the supplied background; Huawei red accents are unchanged.
 $color-black: #000;
 $color-white: #fff;
-$color-canvas: #030303;
-$color-panel: #0a0b0d;
-$color-preview: #0d0e10;
+$color-canvas: #102b45;
+$color-panel: #10283f;
+$color-preview: rgba(5, 20, 37, 0.65);
 $color-ink-dark: #111317;
-$color-surface: #15161a;
-$color-surface-hover: #1b1d22;
-$color-control-alt: #1f2126;
-$color-control: #1f2228;
-$color-border: #26282e;
-$color-border-alt: #26292e;
+$color-surface: rgba(12, 34, 55, 0.88);
+$color-surface-hover: #244766;
+$color-control-alt: #183650;
+$color-control: #1b3b57;
+$color-border: #2a4b68;
+$color-border-alt: #3c607e;
 $color-ink: #263238;
-$color-border-hover: #44474f;
-$color-scrollbar: #555860;
-$color-text-subtle: #6b7280;
-$color-text-muted: #8a8d93;
-$color-placeholder: #929292;
-$color-text-secondary: #c5c7cc;
-$color-icon: #e0e1e5;
+$color-border-hover: #76a1c2;
+$color-scrollbar: #6088a8;
+$color-text-subtle: #b2c9dc;
+$color-text-muted: #b2c9dc;
+$color-placeholder: #b2c9dc;
+$color-text-secondary: #c2d6e6;
+$color-icon: #b2c9dc;
 $color-text-selected: #e5e5ed;
-$color-text-preview: #e5e7eb;
-$color-text: #f5f5f7;
+$color-text-preview: #b2c9dc;
+$color-text: #edf4fa;
 $color-accent: #fe0000;
 $color-accent-link: #ff3b30;
 $color-accent-hover: #ff3535;
 $color-transparent: transparent;
 
 // Alpha colors and effects from the Figma compositions.
-$color-card-shadow: rgba(0, 0, 0, 0.35);
-$color-card-number: rgba(255, 255, 255, 0.02);
-$color-card-number-stroke: rgba(255, 255, 255, 0.04);
-$color-generate-shadow: rgba(79, 70, 229, 0.2);
-$color-popover-shadow-soft: rgba(38, 50, 56, 0.02);
-$color-popover-shadow: rgba(38, 50, 56, 0.1);
-$color-scrollbar-overlay: rgba(255, 255, 255, 0.5);
-$color-hover-overlay: rgba(255, 255, 255, 0.28);
+$color-card-shadow: rgba(0, 8, 20, 0.3);
+$color-card-number: rgba(162, 213, 250, 0.03);
+$color-card-number-stroke: rgba(162, 213, 250, 0.15);
+$color-generate-shadow: rgba(0, 8, 20, 0.25);
+$color-popover-shadow-soft: rgba(0, 8, 20, 0.1);
+$color-popover-shadow: rgba(0, 8, 20, 0.3);
+$color-scrollbar-overlay: rgba(162, 213, 250, 0.3);
+$color-hover-overlay: rgba(162, 213, 250, 0.1);
 
 // Semantic aliases used by the page shell.
-$color-bg: $color-black;
-$color-header: $color-surface;
+$color-bg: #051425;
+$color-header: rgba(8, 25, 43, 0.94);
 $color-muted: $color-text-muted;
 $header-height: 53px;
 $content-max: 1192px;
