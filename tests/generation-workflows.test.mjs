@@ -872,3 +872,27 @@ test('the base-less workbook case reuses Template 02 base image', async () => {
         '/v3/cases/case-002/base.webp',
     );
 });
+
+test('image categories work without Object.hasOwn on older tablet WebViews', async () => {
+    const { isReferenceImageCategory } = await server.ssrLoadModule('/src/data/referenceImageTags.ts');
+    const { mapImageToImagePayload } = await server.ssrLoadModule('/src/features/generation/imageToImage.ts');
+    const original = Object.getOwnPropertyDescriptor(Object, 'hasOwn');
+    try {
+        Object.defineProperty(Object, 'hasOwn', { value: undefined, configurable: true });
+        for (const category of ['architecture', 'interior', 'landscape', 'urban']) {
+            assert.equal(isReferenceImageCategory(category), true);
+            const payload = mapImageToImagePayload({
+                baseImage: { url: 'https://example.test/base.webp' },
+                imageType: category,
+                referenceImages: [{ url: 'https://example.test/reference.webp', tagIds: [] }],
+                prompt: 'Tablet compatibility check',
+            });
+            assert.equal(payload.workflowId, 39);
+        }
+        for (const value of ['toString', 'constructor', '__proto__', 'unknown', null, 0]) {
+            assert.equal(isReferenceImageCategory(value), false);
+        }
+    } finally {
+        Object.defineProperty(Object, 'hasOwn', original);
+    }
+});

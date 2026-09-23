@@ -165,7 +165,7 @@ export const referenceImageTagsByCategory: Readonly<
 };
 
 export const isReferenceImageCategory = (value: unknown): value is ReferenceImageCategory =>
-    typeof value === 'string' && Object.hasOwn(referenceImageTagsByCategory, value);
+    typeof value === 'string' && Object.prototype.hasOwnProperty.call(referenceImageTagsByCategory, value);
 
 export const getReferenceImageTags = (category: ReferenceImageCategory) =>
     referenceImageTagsByCategory[category];
