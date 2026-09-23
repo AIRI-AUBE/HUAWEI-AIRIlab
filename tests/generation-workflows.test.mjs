@@ -21,6 +21,40 @@ after(async () => {
     await server?.close();
 });
 
+test('image export uses the original URL and rejects unsafe protocols', async () => {
+    const { originalImageUrl } = await server.ssrLoadModule(
+        '/src/features/imageExport/imageFile.ts',
+    );
+    assert.equal(
+        originalImageUrl({
+            url: 'https://cdn.example/full.png',
+            thumbnail: 'https://cdn.example/thumb.png',
+        }),
+        'https://cdn.example/full.png',
+    );
+    for (const url of [
+        'javascript:alert(1)',
+        'file:///secret',
+        'http://cdn.example/image.png',
+        'https://user:pass@cdn.example/a',
+    ]) {
+        assert.throws(() => originalImageUrl({ url }));
+    }
+});
+
+test('image export detects real image bytes and bounds file size', async () => {
+    const { inspectImage, imageFilename, maxExportBytes } = await server.ssrLoadModule(
+        '/src/features/imageExport/imageFile.ts',
+    );
+    const png = new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], {
+        type: 'application/octet-stream',
+    });
+    assert.equal(await inspectImage(png), 'image/png');
+    await assert.rejects(inspectImage(new Blob(['<html>error</html>'], { type: 'image/png' })));
+    await assert.rejects(inspectImage(new Blob([new Uint8Array(maxExportBytes + 1)])));
+    assert.match(imageFilename('image/png'), /^AIRI-\d+-[a-z0-9]+\.png$/);
+});
+
 test('text-to-image emits the workflow 44 contract without image inputs', async () => {
     const { mapTextToImagePayload } = await server.ssrLoadModule(
         '/src/features/generation/textToImage.ts',

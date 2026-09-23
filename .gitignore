@@ -151,3 +151,10 @@ vite.config.ts.timestamp-*
 # Python bytecode caches
 __pycache__/
 *.py[cod]
+
+# Android installation artifacts and signing material
+*.apk
+*.aab
+*.jks
+*.keystore
+/AIRI-Android-*/

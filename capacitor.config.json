@@ -1,0 +1,13 @@
+{
+    "appId": "com.airilab.display",
+    "appName": "AIRI Lab",
+    "webDir": "dist",
+    "backgroundColor": "#fbfbfb",
+    "android": {
+        "backgroundColor": "#fbfbfb"
+    },
+    "server": {
+        "hostname": "localhost:3000",
+        "androidScheme": "http"
+    }
+}

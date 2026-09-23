@@ -6,7 +6,7 @@ import {
     isReferenceImageCategory,
 } from '../../data/referenceImageTags';
 import { getV3Case, loadTemplateCase, type V3Template } from '../../data/v3/cases';
-import { hasRequiredImageToImageInputs, mapImageToImagePayload } from '../generation/imageToImage';
+import { getImageToImageDisabledReason, mapImageToImagePayload } from '../generation/imageToImage';
 import { generate, waitForResult } from '../generation/universalGeneration';
 import {
     disposeUploadedImage,
@@ -335,7 +335,20 @@ export function useCreativeRefinementActions() {
     };
 
     const startGeneration = async () => {
-        if (generationLock.current || !hasRequiredImageToImageInputs(state.form)) return;
+        const disabledReason = getImageToImageDisabledReason({
+            hasBaseImage: Boolean(state.form.baseImage?.url),
+            hasReferenceImages: Boolean(
+                state.form.referenceImages.length &&
+                state.form.referenceImages.every(({ url }) => url),
+            ),
+            templateLoading: state.templateStatus === 'loading',
+            uploadInProgress:
+                ['validating', 'uploading'].includes(state.baseStatus) ||
+                ['validating', 'uploading'].includes(state.referenceStatus) ||
+                state.referenceLoadingCount > 0,
+            generating: ['validating', 'submitting', 'generating'].includes(state.generationStatus),
+        });
+        if (generationLock.current || disabledReason) return;
         generationLock.current = true;
         const controller = new AbortController();
         generationAbort.current = controller;

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AIRI Lab</string>
+    <string name="title_activity_main">AIRI Lab</string>
+    <string name="package_name">com.airilab.display</string>
+    <string name="custom_url_scheme">com.airilab.display</string>
+</resources>

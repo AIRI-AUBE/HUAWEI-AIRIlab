@@ -11,6 +11,7 @@ html {
 }
 
 body {
+    isolation: isolate;
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
@@ -32,7 +33,7 @@ a {
 
 .app-shell {
     // width: min(100%, 1440px);
-    min-height: 100dvh;
+    min-height: var(--app-height, 100vh);
     margin-inline: auto;
 }
 
@@ -124,9 +125,8 @@ a {
 }
 
 .home {
-    height: calc(100dvh - 72px);
-    min-height: 0;
-    padding-top: clamp(54px, 16.8vh, 111px);
+    min-height: calc(var(--app-height, 100vh) - 72px);
+    padding-block: clamp(24px, 7vh, 72px);
 }
 
 .app-shell--home .header {
@@ -149,9 +149,10 @@ a {
 
 .mode-heading {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: 22px;
-    margin-bottom: 58px;
+    margin-bottom: clamp(24px, 5vh, 48px);
 }
 
 .mode-heading h1 {
@@ -174,9 +175,10 @@ a {
 }
 
 .mode-card {
+    gap: 20px;
     position: relative;
-    height: min(274px, calc(100dvh - 386px));
-    min-height: 220px;
+    height: auto;
+    min-height: 274px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -245,6 +247,9 @@ a {
 
 .mode-card__footer a {
     @include focus-ring;
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
     color: $color-accent-link;
     font-size: 18px;
     font-weight: 600;
@@ -305,7 +310,7 @@ a {
 
 .text-workspace {
     width: min(calc(100% - 32px), 907px);
-    height: calc(100dvh - $header-height);
+    height: calc(var(--app-height, 100vh) - $header-height);
     display: flex;
     flex-direction: column;
     margin: 0 auto;
@@ -593,6 +598,7 @@ a {
     left: 50%;
     width: 720px;
     height: 448px;
+    max-height: max(80px, calc(var(--app-height, 100vh) - 300px));
     padding: 8px 10px;
     border-radius: 12px;
     outline: none;
@@ -624,7 +630,7 @@ a {
     border: 0;
     border-radius: 7px;
     background: $color-transparent;
-    color: $color-ink;
+    color: $color-text;
     cursor: pointer;
     font-family: 'Albert Sans', $font-sans;
     font-size: 14px;
@@ -644,12 +650,13 @@ a {
 .prompt-option--selected,
 .prompt-option--selected:hover {
     background: $color-text-selected;
+
     color: $color-white;
 }
 
 .image-workspace {
     width: min(calc(100% - 142px), 1370px);
-    height: calc(100dvh - 106px);
+    height: calc(var(--app-height, 100vh) - 106px);
     min-height: 0;
     display: grid;
     grid-template-columns: 240px minmax(0, 1106px);
@@ -679,9 +686,10 @@ a {
 }
 
 .refinement-panel__scroll {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    padding: 16px 10px 70px 14px;
+    padding: 16px 10px 20px 14px;
     scrollbar-color: $color-text-secondary $color-transparent;
     scrollbar-width: thin;
 }
@@ -795,7 +803,7 @@ a {
 
 .template-group h2 {
     margin: 0 0 4px;
-    color: #263238;
+    color: $color-text;
     font-family: 'Albert Sans', $font-sans;
     font-size: 14px;
     font-weight: 400;
@@ -925,9 +933,11 @@ a {
     color: $color-error;
 }
 .generation-error {
-    position: absolute;
-    bottom: 0;
-    width: 180px;
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0 24px 12px;
+    background: $color-panel;
 }
 
 .refinement-section > .image-upload {
@@ -965,6 +975,11 @@ a {
     width: 16px;
     height: 16px;
     display: block;
+}
+
+.image-upload__icon img[src$='upload-reference.svg'] {
+    width: 32px;
+    height: 32px;
 }
 
 .image-upload__previews {
@@ -1244,16 +1259,20 @@ a {
 }
 
 .refinement-generate-shell {
-    position: absolute;
+    position: relative;
     z-index: 2;
-    width: 158px;
-    bottom: 14px;
-    height: 40px;
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+    border-top: 1px solid $color-border-alt;
+    background: $color-panel;
 }
 
 .refinement-generate {
-    width: 100%;
-    height: 100%;
+    width: 158px;
+    height: 40px;
     border: 0;
     padding: 0;
     border-radius: 12px;
@@ -1266,7 +1285,36 @@ a {
 
 .refinement-generate:disabled {
     cursor: not-allowed;
-    opacity: 0.55;
+    background: rgba($color-accent, 0.55);
+}
+
+.refinement-panel {
+    .refinement-template,
+    .refinement-section h2,
+    .control-label,
+    .image-upload__empty,
+    .base-types button,
+    .reference-tags button,
+    .refinement-section textarea {
+        color: $color-text;
+    }
+
+    .category-options-hint,
+    .refinement-section textarea::placeholder {
+        color: $color-text-muted;
+    }
+
+    .image-upload:not(.image-upload--error),
+    .refinement-section textarea {
+        border-color: $color-border-alt;
+    }
+
+    .base-types button.selected,
+    .reference-tags button.selected {
+        background: $color-accent;
+        color: $color-white;
+        border-color: $color-white;
+    }
 }
 
 .refinement-generate-shell:focus-visible {
@@ -1433,7 +1481,7 @@ a {
         width: calc(100% - 32px);
         height: auto;
         max-height: none;
-        grid-template-columns: 240px minmax(600px, 1fr);
+        grid-template-columns: 240px minmax(0, 1fr);
         overflow-x: auto;
     }
 }
@@ -1459,7 +1507,7 @@ a {
 
     .home {
         align-items: flex-start;
-        padding-block: 72px;
+        padding-block: 24px;
     }
 
     .mode-section {
@@ -1482,6 +1530,7 @@ a {
     }
 
     .mode-card {
+        gap: 20px;
         height: auto;
         min-height: 300px;
         padding: 28px 24px 20px;
@@ -1518,14 +1567,14 @@ a {
     }
 
     .prompt-field {
-        grid-template-columns: 48px minmax(0, 1fr);
+        grid-template-columns: max-content minmax(0, 1fr);
         padding-left: 8px;
     }
 
     .template-trigger {
-        width: 48px;
-        overflow: hidden;
-        padding-inline: 14px;
+        width: auto;
+        overflow: visible;
+        padding-inline: 8px;
     }
 
     .template-trigger__icon {
@@ -1533,7 +1582,7 @@ a {
     }
 
     .template-trigger__chevron {
-        display: none;
+        display: block;
     }
 
     .prompt-popover {
@@ -1592,5 +1641,290 @@ a {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
+    }
+}
+
+/* Shared result actions: available without hover on mouse and touch screens. */
+.result-image {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.result-image__open {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 48px;
+    width: 100%;
+    overflow: hidden;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: white;
+    cursor: zoom-in;
+}
+.result-image__open img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.result-image__open span {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba($color-accent, 0.92);
+    color: white;
+}
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+.result-actions button,
+.result-feedback button,
+.image-viewer button {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 1px solid $color-border-alt;
+    border-radius: 10px;
+    background: $color-accent;
+    color: white;
+    font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.result-actions button:disabled,
+.image-viewer button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+.result-feedback {
+    flex: 0 0 auto;
+    padding: 0 8px;
+    color: $color-text;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+.result-feedback:empty {
+    display: none;
+}
+.result-feedback button {
+    margin-left: 8px;
+}
+.result-image__open:focus-visible,
+.result-actions button:focus-visible,
+.image-viewer button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: -3px;
+}
+.image-preview-canvas .generation-preview--result {
+    gap: 0;
+}
+.preview-placeholder--result {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+.image-viewer {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 24px);
+    height: calc(var(--app-height, 100vh) - 24px);
+    max-width: 1600px;
+    max-height: none;
+    padding: 16px;
+    margin: auto;
+    border: 1px solid $color-border-alt;
+    border-radius: 20px;
+    background: $color-surface;
+    color: $color-text;
+}
+.image-viewer[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.image-viewer::backdrop {
+    background: rgba($color-ink, 0.88);
+}
+.image-viewer header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+}
+.image-viewer__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 1 1 auto;
+    min-height: 60px;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+}
+.image-viewer__stage img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: contain;
+    pointer-events: none;
+}
+.image-viewer footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 auto;
+    text-align: center;
+}
+.image-viewer small {
+    color: $color-text-muted;
+}
+.image-viewer p {
+    margin: 0;
+}
+
+@media (pointer: coarse) {
+    button,
+    a,
+    [role='button'] {
+        touch-action: manipulation;
+    }
+    .brand,
+    .button--ghost,
+    .nav a,
+    .template-trigger,
+    .refinement-template,
+    .prompt-option,
+    .base-types button,
+    .reference-tags button,
+    .refinement-generate,
+    .generate-button,
+    .primary-button {
+        min-height: 48px;
+    }
+    .nav a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px;
+    }
+    .nav a.active::after {
+        bottom: 3px;
+    }
+    .base-types {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .base-types button,
+    .reference-tags button {
+        font-size: 12px;
+    }
+    .reference-tags {
+        width: 180px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .base-types button span {
+        width: auto;
+    }
+    .refinement-section textarea,
+    .prompt-field textarea {
+        font-size: 16px;
+    }
+    .refinement-panel__scroll {
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+    .upload-preview__remove {
+        top: 0;
+        right: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 0;
+        background: radial-gradient(circle at center, white 13px, transparent 14px);
+        font-size: 22px;
+    }
+    .prompt-field {
+        min-height: 64px;
+    }
+    .prompt-composer {
+        flex-basis: 124px;
+    }
+    .template-trigger {
+        width: auto;
+        overflow: visible;
+    }
+    .prompt-field {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1000px) {
+    .image-workspace {
+        width: calc(100% - 32px);
+        height: calc(var(--app-height, 100vh) - 106px);
+        grid-template-columns: 240px minmax(0, 1fr);
+        overflow: hidden;
+        gap: 16px;
+    }
+}
+@media (max-width: 640px) {
+    .image-workspace {
+        height: auto;
+        overflow: visible;
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .refinement-panel {
+        height: min(620px, calc(var(--app-height, 100vh) * 0.7));
+    }
+    .image-preview-panel {
+        height: calc(var(--app-height, 100vh) * 0.6);
+        min-height: 320px;
+    }
+    .image-viewer {
+        padding: 8px;
+    }
+    .image-viewer small {
+        display: none;
+    }
+}
+
+// Disabled actions must not look ready to submit.
+.generate-button:disabled,
+.refinement-generate:disabled {
+    background: $color-control;
+    color: $color-text-muted;
+    opacity: 1;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .prompt-field {
+        height: auto;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    .template-trigger {
+        width: 100%;
+        min-height: 44px;
+    }
+    .prompt-field textarea {
+        height: 56px;
+        font-size: 16px;
+    }
+    .prompt-field textarea::placeholder {
+        font-size: 14px;
+    }
+    .prompt-composer {
+        flex: 0 0 auto;
     }
 }

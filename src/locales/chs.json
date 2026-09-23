@@ -1,4 +1,27 @@
 {
+    "result": {
+        "actions": "图片操作",
+        "open": "查看大图",
+        "original": "原图预览",
+        "alt": "生成结果",
+        "save": "保存原图",
+        "share": "分享",
+        "close": "关闭",
+        "retry": "重试",
+        "preparing": "正在准备原图，请稍候…",
+        "saved": "已保存到你选择的位置：{{filename}}",
+        "downloadStarted": "已开始下载，请查看浏览器下载列表。",
+        "shareOpened": "已打开系统分享。",
+        "cancelled": "已取消保存或分享。",
+        "failed": "未能完成操作，请检查网络、可用空间或图片链接后重试。",
+        "tooLarge": "图片超过 50 MB，暂时无法保存或分享。",
+        "shareUnavailable": "此浏览器不支持系统分享，请先保存原图。",
+        "loadFailed": "原图加载失败，请检查网络后重试。",
+        "zoomIn": "放大",
+        "zoomOut": "缩小",
+        "reset": "复位",
+        "gestures": "双指缩放 · 放大后拖动 · 双击放大或复位"
+    },
     "common": {
         "homeLabel": "AIRI Lab 首页",
         "mainNavigation": "主导航",
