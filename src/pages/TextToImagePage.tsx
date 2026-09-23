@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { defaultPromptTemplates, type PromptTemplate } from '../data/prompts';
 import { PromptTemplateModal } from '../components/PromptTemplateModal';
+import { ResultImage } from '../components/ResultImage';
 import { generate, waitForResult } from '../features/generation/universalGeneration';
 import { mapTextToImagePayload } from '../features/generation/textToImage';
 import type { GenerationOutput } from '../features/generation/types';
@@ -84,11 +85,7 @@ export function TextToImagePage() {
                     >
                         {generating && <span className="image-skeleton" aria-hidden="true" />}
                         {output ? (
-                            <img
-                                className="text-generation-output"
-                                src={output.thumbnail || output.url}
-                                alt={t('textToImage.generatedImageAlt')}
-                            />
+                            <ResultImage key={output.url} output={output} />
                         ) : !generating ? (
                             <>
                                 <img

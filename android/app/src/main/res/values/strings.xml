@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Huawei AIRI</string>
+    <string name="title_activity_main">Huawei AIRI</string>
+    <string name="package_name">com.airilab.huawei.display</string>
+    <string name="custom_url_scheme">com.airilab.huawei.display</string>
+</resources>

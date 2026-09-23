@@ -120,6 +120,13 @@ export function ImageUploadField({
                                         event.stopPropagation();
                                         onRemove(index);
                                     }}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            onRemove(index);
+                                        }
+                                    }}
                                 >
                                     ×
                                 </span>

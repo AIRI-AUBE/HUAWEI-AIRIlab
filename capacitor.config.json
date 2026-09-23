@@ -1,0 +1,13 @@
+{
+    "appId": "com.airilab.huawei.display",
+    "appName": "Huawei AIRI",
+    "webDir": "dist",
+    "backgroundColor": "#051425",
+    "android": {
+        "backgroundColor": "#051425"
+    },
+    "server": {
+        "hostname": "localhost:3000",
+        "androidScheme": "http"
+    }
+}

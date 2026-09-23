@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+    <meta charset="utf-8" /><meta
+        name="viewport"
+        content="width=device-width,initial-scale=1"
+    /><title>AIRI · Screen preview</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #e8edf2;
+            color: #14283b;
+            font: 14px system-ui;
+        }
+        header {
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid #becbd7;
+        }
+        label {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        select,
+        button,
+        input {
+            font: inherit;
+            padding: 8px;
+            border: 1px solid #9caebf;
+            border-radius: 6px;
+            background: white;
+        }
+        input {
+            width: 84px;
+        }
+        main {
+            padding: 24px;
+            overflow: auto;
+            height: calc(100vh - 125px);
+        }
+        #frame {
+            background: #051425;
+            box-shadow: 0 8px 32px #0003;
+            transform-origin: top left;
+            border: 0;
+            display: block;
+        }
+        #stage {
+            margin: auto;
+        }
+        p {
+            margin: 12px 16px;
+            color: #465e73;
+        }
+        #scale {
+            margin-left: auto;
+        }
+    </style>
+    <header>
+        <strong>AIRI · Screen preview</strong
+        ><label
+            >Page
+            <select id="route">
+                <option value="/">Home</option>
+                <option value="/text-to-image">Text to image</option>
+                <option value="/image-to-image">Image to image</option>
+            </select></label
+        ><label
+            >Screen
+            <select id="preset">
+                <option value="1280,744">Tablet · 1280 × 744</option>
+                <option value="1024,584" selected>Tablet, larger UI · 1024 × 584</option>
+                <option value="800,1280">Portrait tablet · 800 × 1280</option>
+                <option value="844,390">Landscape phone · 844 × 390</option>
+                <option value="390,844">Portrait phone · 390 × 844</option>
+                <option value="1440,900">Desktop · 1440 × 900</option>
+            </select></label
+        ><label>W <input id="w" type="number" min="320" max="3840" value="1024" /></label
+        ><label>H <input id="h" type="number" min="240" max="2160" value="584" /></label
+        ><button id="apply">Apply</button><button id="rotate">Rotate</button
+        ><label><input id="fit" type="checkbox" checked style="width: auto" />Fit preview</label
+        ><span id="scale"></span>
+    </header>
+    <p>
+        Sizes are CSS pixels (usable app area), not physical screen resolution. Fit preview only
+        scales this frame for viewing. Device touch, keyboard and WebView compatibility require
+        separate testing.
+    </p>
+    <main>
+        <div id="stage"><iframe id="frame" title="Live app preview" src="/"></iframe></div>
+    </main>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        function layout() {
+            const w = Math.max(320, Math.min(3840, Number($('w').value) || 1024)),
+                h = Math.max(240, Math.min(2160, Number($('h').value) || 584));
+            $('w').value = w;
+            $('h').value = h;
+            const zoom = $('fit').checked
+                ? Math.min(1, (document.querySelector('main').clientWidth - 48) / w)
+                : 1;
+            $('frame').style.width = w + 'px';
+            $('frame').style.height = h + 'px';
+            $('frame').style.transform = 'scale(' + zoom + ')';
+            $('stage').style.width = w * zoom + 'px';
+            $('stage').style.height = h * zoom + 'px';
+            $('scale').textContent =
+                w + ' × ' + h + ' CSS px · preview ' + Math.round(zoom * 100) + '%';
+        }
+        $('route').onchange = () => ($('frame').src = $('route').value);
+        $('preset').onchange = () => {
+            [$('w').value, $('h').value] = $('preset').value.split(',');
+            layout();
+        };
+        $('apply').onclick = layout;
+        $('rotate').onclick = () => {
+            [$('w').value, $('h').value] = [$('h').value, $('w').value];
+            layout();
+        };
+        $('fit').onchange = layout;
+        window.addEventListener('resize', layout);
+        layout();
+    </script>
+</html>

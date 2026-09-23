@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useCreativeRefinement } from '../features/creativeRefinement/CreativeRefinementContext';
+import { ResultImage } from './ResultImage';
 
 export function CreativeRefinementPreview() {
     const { t } = useTranslation();
@@ -18,14 +19,11 @@ export function CreativeRefinementPreview() {
                     className={`${primaryOutput ? 'generation-preview--result' : ''}${generating ? ' generation-preview--loading' : ''}`}
                 >
                     {generating && <span className="image-skeleton" aria-hidden="true" />}
-                    <img
-                        src={
-                            primaryOutput?.thumbnail ||
-                            primaryOutput?.url ||
-                            '/assets/figma/image-placeholder-large.svg'
-                        }
-                        alt={primaryOutput ? 'Generated result' : ''}
-                    />
+                    {primaryOutput ? (
+                        <ResultImage key={primaryOutput.url} output={primaryOutput} />
+                    ) : (
+                        <img src="/assets/figma/image-placeholder-large.svg" alt="" />
+                    )}
                     {!primaryOutput && !generating && (
                         <strong>{t('imageToImage.previewDescription')}</strong>
                     )}

@@ -1,4 +1,27 @@
 {
+    "result": {
+        "actions": "Image actions",
+        "open": "View image",
+        "original": "Original image",
+        "alt": "Generated result",
+        "save": "Save original",
+        "share": "Share",
+        "close": "Close",
+        "retry": "Retry",
+        "preparing": "Preparing the original image…",
+        "saved": "Saved to your chosen location: {{filename}}",
+        "downloadStarted": "Download started. Check your browser downloads.",
+        "shareOpened": "System sharing opened.",
+        "cancelled": "Save or share cancelled.",
+        "failed": "Unable to finish. Check your connection, free space or image link, then retry.",
+        "tooLarge": "Images over 50 MB cannot be saved or shared.",
+        "shareUnavailable": "This browser cannot open system sharing. Save the original first.",
+        "loadFailed": "The original image could not load. Check your connection and retry.",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "reset": "Reset",
+        "gestures": "Pinch to zoom · Drag when zoomed · Double-tap to zoom or reset"
+    },
     "common": {
         "homeLabel": "Huawei AIRI home",
         "mainNavigation": "Main navigation",
